@@ -1,0 +1,38 @@
+# PlatformIO build environments
+.pio/
+.pioenvs/
+.vscode
+
+# PlatformIO library management
+.piolibdeps/
+
+# Firmware binaries
+*.hex
+*.bin
+*.elf
+
+# Local documentation and hardware reference files
+docs/
+
+# VSCode settings (optional, if not shared)
+.vscode/
+
+# Other common ignored files
+.DS_Store
+*.o
+*.d
+*.su
+*.map
+*.bak
+*.swp
+*.json
+
+# KiCad generated/cache files
+*.lck
+fp-info-cache
+*.kicad_prl
+*-backups/
+.history/
+
+# Generated manufacturing archives
+docs/**/Gerber/*.zip
