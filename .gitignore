@@ -11,8 +11,9 @@
 *.bin
 *.elf
 
-# Local documentation and hardware reference files
-docs/
+# Local documentation/reference files, except KiCad project sources
+docs/**/*.pdf
+docs/**/*.docx
 
 # VSCode settings (optional, if not shared)
 .vscode/
@@ -34,5 +35,5 @@ fp-info-cache
 *-backups/
 .history/
 
-# Generated manufacturing archives
-docs/**/Gerber/*.zip
+# Generated manufacturing files
+docs/**/Gerber/
