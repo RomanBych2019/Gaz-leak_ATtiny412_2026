@@ -2778,12 +2778,6 @@
 		(uuid "6b5e6650-f97a-4cf8-bf56-3d7a5be84aac")
 	)
 	(junction
-		(at 252.73 50.8)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "7030db6c-0a61-41e0-8274-ac7d53249ad5")
-	)
-	(junction
 		(at 111.76 142.24)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2864,16 +2858,6 @@
 			(type default)
 		)
 		(uuid "0129c35a-a4a3-403c-86b0-70f5e40eeaad")
-	)
-	(wire
-		(pts
-			(xy 238.76 50.8) (xy 242.57 50.8)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "01c256e3-a675-4fed-838b-a4b1a3ad591b")
 	)
 	(wire
 		(pts
@@ -2987,7 +2971,7 @@
 	)
 	(wire
 		(pts
-			(xy 252.73 50.8) (xy 273.05 50.8)
+			(xy 262.89 50.8) (xy 273.05 50.8)
 		)
 		(stroke
 			(width 0)
@@ -3014,16 +2998,6 @@
 			(type default)
 		)
 		(uuid "20d6fbfc-86c4-432b-a9db-c976b21c3d84")
-	)
-	(wire
-		(pts
-			(xy 247.65 58.42) (xy 252.73 58.42)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "254338c9-458e-4ef4-87ca-6d0d7816226c")
 	)
 	(wire
 		(pts
@@ -3054,16 +3028,6 @@
 			(type default)
 		)
 		(uuid "292a698d-4ad4-4dbb-8907-1839d31fabe8")
-	)
-	(wire
-		(pts
-			(xy 247.65 43.18) (xy 252.73 43.18)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "2b02d1fe-4b70-4a28-9d0a-8d608ae49aec")
 	)
 	(wire
 		(pts
@@ -3287,16 +3251,6 @@
 	)
 	(wire
 		(pts
-			(xy 252.73 58.42) (xy 252.73 50.8)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "74c40a68-4254-4334-a29d-1391c49ff3d7")
-	)
-	(wire
-		(pts
 			(xy 170.18 57.15) (xy 175.26 57.15)
 		)
 		(stroke
@@ -3444,16 +3398,6 @@
 			(type default)
 		)
 		(uuid "ad2df633-2eff-4071-9e87-53004b7876db")
-	)
-	(wire
-		(pts
-			(xy 252.73 43.18) (xy 252.73 50.8)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ad3bec22-c68e-49b8-a8a4-9ac4a5f1065b")
 	)
 	(wire
 		(pts
@@ -4001,7 +3945,7 @@
 		)
 		(uuid "7397dedc-8cd1-45d6-9cff-0a27b10ad449")
 	)
-	(label "OUT2"
+	(label "LIN"
 		(at 262.89 68.58 180)
 		(effects
 			(font
@@ -4038,7 +3982,7 @@
 		(uuid "a4d1469e-6d17-431b-8401-57540a93a2b5")
 	)
 	(label "+5v"
-		(at 238.76 50.8 180)
+		(at 262.89 50.8 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4097,7 +4041,7 @@
 		)
 		(uuid "e13db009-69d8-4527-8311-f2d4bb2aabc9")
 	)
-	(label "OUT1"
+	(label "OUT"
 		(at 262.89 66.04 180)
 		(effects
 			(font
@@ -6762,90 +6706,6 @@
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "C9")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Diode:BAV70")
-		(at 247.65 50.8 270)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "eb1a36c6-fb14-4b65-8cdb-d701e840b9a1")
-		(property "Reference" "D8"
-			(at 245.618 41.402 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "BAV70"
-			(at 249.682 41.402 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
-			(at 247.65 50.8 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/BAV70_SER.pdf"
-			(at 247.65 50.8 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Dual 100V 215mA high-speed switching diodes, common cathode, SOT-23"
-			(at 247.65 50.8 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "2"
-			(uuid "8c9394b9-6b4e-47a1-b65a-1773e69f8ca8")
-		)
-		(pin "1"
-			(uuid "b0494de9-244c-484a-b04d-1e3c1e8ec7a5")
-		)
-		(pin "3"
-			(uuid "1890e510-7488-4308-9563-56984d1a332b")
-		)
-		(instances
-			(project "Датчик утечки газа 2026"
-				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
-					(reference "D8")
 					(unit 1)
 				)
 			)
