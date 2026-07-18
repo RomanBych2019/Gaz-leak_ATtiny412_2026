@@ -1,35 +1,48 @@
 #include <Arduino.h>
 
 // ============================================================
-// ATtiny412 gas sensor controller
+// Контроллер датчика газа на ATtiny412
 // ============================================================
-// PA0 - UPDI, do not use as GPIO
-// PA1 - board status LED
-// PA2 - ADC sensor input, external pull-down 4.7 kOhm to GND
-// PA3 - debug TX, software UART 1200 baud
-// PA6 - power switch output 1
-// PA7 - power switch output 2
+// PA0 - UPDI, не использовать как GPIO
+// PA1 - светодиод состояния платы
+// PA2 - вход АЦП датчика, внешняя подтяжка 4.7 кОм к GND
+// PA3 - отладочный TX, программный UART 9600 бод
+// PA6 - выход силового ключа 1
+// PA7 - выход силового ключа 2
 //
-// Logic:
-// - sensor voltage is checked by fixed ADC thresholds
-// - ADC near 0 V: sensor open or sensor line connected to GND
-// - ADC near +5 V: sensor output shorted to VCC
-// - ALARM state is latched in RAM and can be reset only by power cycling
-// - other states can return to NORMAL when ADC returns to valid range
+// Логика:
+// - напряжение датчика проверяется по фиксированным порогам АЦП
+// - АЦП около 0 В: датчик оборван или линия датчика подключена к GND
+// - АЦП около +5 В: выход датчика замкнут на VCC
+// - состояние ALARM защелкивается в RAM и сбрасывается только отключением питания
+// - остальные состояния могут вернуться в NORMAL, когда АЦП вернется в допустимый диапазон
 // ============================================================
 
+// #define DEBUG
+#define LIN_DRIVER
+
+#ifndef LIN_DRIVER
 #define LED_PIN       PIN_PA1
 #define SENSOR_PIN    PIN_PA2
 #define DEBUG_TX_PIN  PIN_PA3
 #define KEY1_PIN      PIN_PA6
 #define KEY2_PIN      PIN_PA7
-
+#else
+#define LED_PIN       PIN_PA3
+#define SENSOR_PIN    PIN_PA6
+#define DEBUG_TX_PIN  PIN_PA3 
+#define KEY1_PIN      PIN_PA7
+#define KEY2_PIN      PIN_PA7
+#endif
 // ============================================================
-// Debug software UART on PA3
+// Отладочный программный UART на PA3
 // ============================================================
 
-#define DEBUG_BAUD 1200UL
-#define BIT_TIME_US (1000000UL / DEBUG_BAUD)
+
+#ifdef DEBUG
+
+const uint32_t  DEBUG_BAUD = 2400;
+const uint16_t  BIT_TIME_US = (1000000UL / DEBUG_BAUD);
 
 void debugTxWriteBit(bool bitValue)
 {
@@ -41,16 +54,16 @@ void debugTxWriteByte(uint8_t b)
 {
   noInterrupts();
 
-  // Start bit
+  // Стартовый бит
   debugTxWriteBit(false);
 
-  // Data bits, LSB first
+  // Биты данных, младший бит первым
   for (uint8_t i = 0; i < 8; i++) {
     debugTxWriteBit(b & 0x01);
     b >>= 1;
   }
 
-  // Stop bit
+  // Стоповый бит
   debugTxWriteBit(true);
 
   interrupts();
@@ -75,71 +88,72 @@ void debugPrintUint(uint32_t value)
   ultoa(value, buf, 10);
   debugPrint(buf);
 }
+#endif
 
 // ============================================================
-// Main settings
+// Основные настройки
 // ============================================================
 
-// ADC is 10-bit in Arduino analogRead(): 0...1023
+// АЦП в Arduino analogRead() 10-битный: 0...1023
 const uint16_t ADC_MAX_VALUE = 1023;
 
-// Sensor warmup time after power-up.
-// During warmup PA6/PA7 stay in safe state.
-const uint32_t SENSOR_WARMUP_MS = 30000UL;
+// Время прогрева датчика после включения питания.
+// Во время прогрева PA6/PA7 остаются в безопасном состоянии.
+const uint32_t SENSOR_WARMUP_MS = 45000UL;
 
-// Debug output period
+// Период отладочного вывода
 const uint32_t DEBUG_PERIOD_MS = 1000UL;
 
-// Gas alarm confirmation time.
-// ALARM is latched only if gas threshold is exceeded continuously
-// for this time.
+// Время подтверждения тревоги по газу.
+// ALARM защелкивается, только если газовый порог непрерывно превышен
+// в течение этого времени.
 const uint32_t ALARM_CONFIRM_MS = 3000UL;
 
-// Sensor fault confirmation time by min/max voltage
+// Время подтверждения неисправности датчика по мин./макс. напряжению
 const uint32_t FAULT_CONFIRM_MS = 1000UL;
 
-// Sensor fault release time.
-// FAULT states can return to NORMAL when ADC returns to valid range.
+// Время выхода из неисправности датчика.
+// Состояния FAULT могут вернуться в NORMAL, когда АЦП вернется в допустимый диапазон.
 const uint32_t FAULT_RELEASE_MS = 1000UL;
 
-// ADC averaging
+// Усреднение АЦП
 const uint8_t ADC_SAMPLES = 16;
 
-// ADC low-pass filter coefficient.
-// 8 means: filtered = filtered * 7/8 + raw * 1/8
+// Коэффициент ФНЧ для АЦП.
+// 8 означает: filtered = filtered * 7/8 + raw * 1/8
 const uint8_t FILTER_DIV = 8;
 
 // ============================================================
-// Gas thresholds
+// Газовые пороги
 // ============================================================
 
-// true  - ADC signal increases when gas is present
-// false - ADC signal decreases when gas is present
+// true  - сигнал АЦП увеличивается при наличии газа
+// false - сигнал АЦП уменьшается при наличии газа
 const bool SENSOR_SIGNAL_INCREASES_WITH_GAS = true;
 
-// Gas alarm ON threshold
+// Порог включения тревоги по газу
 const uint16_t GAS_ALARM_ON_ADC = 650;
 
-// Gas alarm OFF threshold is not used to reset ALARM anymore,
-// because ALARM is latched until power cycle.
-// It is kept only for possible future non-latched variants.
+// Порог выключения тревоги по газу больше не используется для сброса ALARM,
+// потому что ALARM защелкивается до отключения питания.
+// Оставлен только для возможных будущих вариантов без защелкивания.
 const uint16_t GAS_ALARM_OFF_ADC = 580;
 
 // ============================================================
-// Sensor voltage diagnostic thresholds
+// Диагностические пороги напряжения датчика
 // ============================================================
 //
-// PA2 has external 4.7 kOhm pull-down to GND.
+// На PA2 установлена внешняя подтяжка 4.7 кОм к GND.
 //
 // ADC <= ADC_SENSOR_OPEN_OR_GND_ON:
-//   sensor open or sensor line connected to GND.
-//   PA2 voltage is near 0 V.
+//   датчик оборван или линия датчика подключена к GND.
+//   напряжение на PA2 около 0 В.
 //
 // ADC >= ADC_SENSOR_SHORT_TO_VCC_ON:
-//   sensor output shorted to supply.
-//   PA2 voltage is near +5 V.
+//   выход датчика замкнут на питание.
+//   напряжение на PA2 около +5 В.
 //
-// OFF thresholds provide hysteresis for returning from fault states.
+// Пороги OFF задают гистерезис для возврата из состояний неисправности.
 
 const uint16_t ADC_SENSOR_OPEN_OR_GND_ON  = 20;
 const uint16_t ADC_SENSOR_OPEN_OR_GND_OFF = 50;
@@ -147,28 +161,28 @@ const uint16_t ADC_SENSOR_OPEN_OR_GND_OFF = 50;
 const uint16_t ADC_SENSOR_SHORT_TO_VCC_ON  = 1000;
 const uint16_t ADC_SENSOR_SHORT_TO_VCC_OFF = 970;
 
-// Approximate values at VCC = 5 V:
+// Приблизительные значения при VCC = 5 В:
 // ADC 20   ~= 0.10 V
 // ADC 50   ~= 0.24 V
 // ADC 970  ~= 4.74 V
 // ADC 1000 ~= 4.89 V
 
 // ============================================================
-// System states
+// Состояния системы
 // ============================================================
 
 enum SystemState {
   STATE_WARMUP,
   STATE_NORMAL,
   STATE_ALARM,
-  STATE_SENSOR_OPEN_OR_GND,   // sensor open or sensor line connected to GND
-  STATE_SENSOR_SHORT_TO_VCC   // sensor output shorted to supply
+  STATE_SENSOR_OPEN_OR_GND,   // датчик оборван или линия датчика подключена к GND
+  STATE_SENSOR_SHORT_TO_VCC   // выход датчика замкнут на питание
 };
 
 SystemState systemState = STATE_WARMUP;
 
 // ============================================================
-// PA6 / PA7 behavior variants
+// Варианты поведения PA6 / PA7
 // ============================================================
 //
 // MOD_SINGLE_HIGH:
@@ -191,7 +205,7 @@ SystemState systemState = STATE_WARMUP;
 //   NORMAL       PA6=1, PA7=1
 //   ALARM        PA6=0, PA7=0
 //
-// During WARMUP and sensor fault states PA6/PA7 are switched off.
+// Во время WARMUP и состояний неисправности датчика PA6/PA7 выключены.
 
 enum SensorModification {
   MOD_SINGLE_HIGH,
@@ -201,8 +215,8 @@ enum SensorModification {
   MOD_ACTIVE_LOW
 };
 
-// ------------ SELECT SENSOR MODIFICATION HERE ---------------
-const SensorModification SENSOR_MODIFICATION = MOD_SINGLE_HIGH;
+// ------------ ВЫБЕРИТЕ МОДИФИКАЦИЮ ДАТЧИКА ЗДЕСЬ ------------
+const SensorModification SENSOR_MODIFICATION = MOD_ACTIVE_LOW;
 // -------------------------------------------------------------
 
 struct OutputState {
@@ -214,13 +228,22 @@ const OutputState OUTPUT_SAFE_OFF = { false, false };
 
 OutputState getOutputState(SystemState state)
 {
-  if (state == STATE_WARMUP ||
-      state == STATE_SENSOR_OPEN_OR_GND ||
+  // if (state == STATE_WARMUP ||
+  //     state == STATE_SENSOR_OPEN_OR_GND ||
+  //     state == STATE_SENSOR_SHORT_TO_VCC) {
+  //   return OUTPUT_SAFE_OFF;
+  // }
+  
+  bool alarm = (state == STATE_ALARM);
+
+  if (state == STATE_WARMUP){
+    alarm = false;
+  }
+  
+  if (state == STATE_SENSOR_OPEN_OR_GND ||
       state == STATE_SENSOR_SHORT_TO_VCC) {
     return OUTPUT_SAFE_OFF;
   }
-
-  bool alarm = (state == STATE_ALARM);
 
   switch (SENSOR_MODIFICATION) {
     case MOD_SINGLE_HIGH:
@@ -273,7 +296,7 @@ uint16_t readAdcAverage()
 }
 
 // ============================================================
-// Gas threshold logic
+// Логика газового порога
 // ============================================================
 
 bool isAlarmOnLevel(uint16_t adc)
@@ -295,7 +318,7 @@ bool isAlarmOffLevel(uint16_t adc)
 }
 
 // ============================================================
-// Sensor fault level logic
+// Логика уровней неисправности датчика
 // ============================================================
 
 bool isSensorOpenOrGndOn(uint16_t adc)
@@ -319,16 +342,16 @@ bool isSensorShortToVccOff(uint16_t adc)
 }
 
 // ============================================================
-// LED indication
+// Индикация светодиодом
 // ============================================================
 //
-// PA1 works the same for all sensor modifications.
+// PA1 работает одинаково для всех модификаций датчика.
 //
-// WARMUP              - short blink once per second
-// NORMAL              - short blink once per 2 seconds
-// ALARM               - fast blinking, latched until power cycle
-// SENSOR_OPEN_OR_GND  - two flashes, pause
-// SENSOR_SHORT_TO_VCC - three flashes, pause
+// WARMUP              - короткая вспышка раз в секунду
+// NORMAL              - короткая вспышка раз в 2 секунды
+// ALARM               - частое мигание, защелкнуто до отключения питания
+// SENSOR_OPEN_OR_GND  - две вспышки, пауза
+// SENSOR_SHORT_TO_VCC - три вспышки, пауза
 
 void ledSet(bool on)
 {
@@ -378,7 +401,7 @@ void updateLed(SystemState state)
 }
 
 // ============================================================
-// State helpers
+// Вспомогательные функции состояния
 // ============================================================
 
 void setState(SystemState newState)
@@ -402,13 +425,13 @@ const char *stateToText(SystemState state)
 }
 
 // ============================================================
-// Global variables
+// Глобальные переменные
 // ============================================================
 
 uint16_t filteredAdc = 0;
 
-// ALARM latch. Stored in RAM, so it resets after power cycling.
-// Note: hardware reset or watchdog reset also clears RAM on normal startup.
+// Защелка ALARM. Хранится в RAM, поэтому сбрасывается после отключения питания.
+// Примечание: аппаратный сброс или сброс watchdog также очищает RAM при обычном старте.
 bool alarmLatched = false;
 
 uint32_t alarmStartMs = 0;
@@ -417,9 +440,9 @@ uint32_t faultReleaseStartMs = 0;
 uint32_t lastDebugMs = 0;
 
 // ============================================================
-// Debug status
+// Отладочный статус
 // ============================================================
-
+#ifdef DEBUG
 void debugStatus(uint16_t adcRaw)
 {
   debugPrint("state=");
@@ -451,16 +474,17 @@ void debugStatus(uint16_t adcRaw)
 
   debugPrint("\r\n");
 }
+#endif
 
 // ============================================================
-// Sensor fault processing
+// Обработка неисправностей датчика
 // ============================================================
 
 bool processFaults(uint16_t adc)
 {
   uint32_t now = millis();
 
-  // Already in state: sensor open or sensor line connected to GND
+  // Уже в состоянии: датчик оборван или линия датчика подключена к GND
   if (systemState == STATE_SENSOR_OPEN_OR_GND) {
     if (isSensorOpenOrGndOff(adc)) {
       if (faultReleaseStartMs == 0) {
@@ -480,7 +504,7 @@ bool processFaults(uint16_t adc)
     return true;
   }
 
-  // Already in state: sensor output shorted to supply
+  // Уже в состоянии: выход датчика замкнут на питание
   if (systemState == STATE_SENSOR_SHORT_TO_VCC) {
     if (isSensorShortToVccOff(adc)) {
       if (faultReleaseStartMs == 0) {
@@ -500,7 +524,7 @@ bool processFaults(uint16_t adc)
     return true;
   }
 
-  // New fault: PA2 near 0 V
+  // Новая неисправность: PA2 около 0 В
   if (isSensorOpenOrGndOn(adc)) {
     if (faultStartMs == 0) {
       faultStartMs = now;
@@ -517,7 +541,7 @@ bool processFaults(uint16_t adc)
     return false;
   }
 
-  // New fault: PA2 near +5 V
+  // Новая неисправность: PA2 около +5 В
   if (isSensorShortToVccOn(adc)) {
     if (faultStartMs == 0) {
       faultStartMs = now;
@@ -541,7 +565,7 @@ bool processFaults(uint16_t adc)
 }
 
 // ============================================================
-// Setup
+// Настройка
 // ============================================================
 
 void setup()
@@ -550,19 +574,21 @@ void setup()
   pinMode(KEY1_PIN, OUTPUT);
   pinMode(KEY2_PIN, OUTPUT);
 
-  // External 4.7 kOhm pull-down to GND is installed on PCB.
-  // Internal pull-up must not be enabled.
+  // На плате установлена внешняя подтяжка 4.7 кОм к GND.
+  // Внутренняя подтяжка не должна быть включена.
   pinMode(SENSOR_PIN, INPUT);
 
   pinMode(DEBUG_TX_PIN, OUTPUT);
-  digitalWrite(DEBUG_TX_PIN, HIGH); // UART idle level
+  digitalWrite(DEBUG_TX_PIN, HIGH); // уровень покоя UART
 
   setState(STATE_WARMUP);
   applyOutputs(STATE_WARMUP);
 
+  #ifdef DEBUG
   debugPrintln("");
   debugPrintln("ATtiny412 gas sensor controller start");
   debugPrintln("ALARM is latched until power cycle");
+  #endif
 
   uint32_t warmupStart = millis();
 
@@ -574,13 +600,13 @@ void setup()
 
   filteredAdc = readAdcAverage();
 
-filteredAdc = readAdcAverage();
-
+  #ifdef DEBUG
   debugPrintln("Warmup done");
+  #endif
 }
 
 // ============================================================
-// Loop
+// Основной цикл
 // ============================================================
 
 void loop()
@@ -591,22 +617,22 @@ void loop()
     ((uint32_t)filteredAdc * (FILTER_DIV - 1) + adcRaw) / FILTER_DIV;
 
   // ----------------------------------------------------------
-  // If ALARM has been latched, it cannot return to NORMAL.
-  // Reset only by removing controller power.
-  // Other states can return to NORMAL.
+  // Если ALARM защелкнут, он не может вернуться в NORMAL.
+  // Сброс только снятием питания с контроллера.
+  // Остальные состояния могут вернуться в NORMAL.
   // ----------------------------------------------------------
   if (alarmLatched) {
     setState(STATE_ALARM);
   } else {
-    // First process sensor voltage diagnostic states.
-    // Sensor fault states are recoverable.
+    // Сначала обработать диагностические состояния напряжения датчика.
+    // Состояния неисправности датчика восстанавливаемые.
     bool faultActive = processFaults(filteredAdc);
 
     if (!faultActive &&
         systemState != STATE_SENSOR_OPEN_OR_GND &&
         systemState != STATE_SENSOR_SHORT_TO_VCC) {
 
-      // Wait until gas threshold is exceeded continuously.
+      // Ждать, пока газовый порог будет превышен непрерывно.
       if (isAlarmOnLevel(filteredAdc)) {
         if (alarmStartMs == 0) {
           alarmStartMs = millis();
@@ -626,10 +652,12 @@ void loop()
   applyOutputs(systemState);
   updateLed(systemState);
 
+  #ifdef DEBUG
   if (millis() - lastDebugMs >= DEBUG_PERIOD_MS) {
     lastDebugMs = millis();
     debugStatus(adcRaw);
   }
+  #endif
 
   delay(50);
 }
