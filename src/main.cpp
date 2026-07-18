@@ -19,7 +19,7 @@
 // ============================================================
 
 // #define DEBUG
-#define LIN_DRIVER
+// #define LIN_DRIVER
 
 #ifndef LIN_DRIVER
 #define LED_PIN       PIN_PA1
@@ -98,7 +98,6 @@ void debugPrintUint(uint32_t value)
 const uint16_t ADC_MAX_VALUE = 1023;
 
 // Время прогрева датчика после включения питания.
-// Во время прогрева PA6/PA7 остаются в безопасном состоянии.
 const uint32_t SENSOR_WARMUP_MS = 45000UL;
 
 // Период отладочного вывода

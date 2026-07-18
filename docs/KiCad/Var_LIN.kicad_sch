@@ -430,6 +430,194 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Device:D"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "D"
+				(at 0 2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "D"
+				(at 0 -2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Diode"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Sim.Device" "D"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Sim.Pins" "1=K 2=A"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "diode"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "TO-???* *_Diode_* *SingleDiode* D_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "D_0_1"
+				(polyline
+					(pts
+						(xy -1.27 1.27) (xy -1.27 -1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 1.27) (xy 1.27 -1.27) (xy -1.27 0) (xy 1.27 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 0) (xy -1.27 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "D_1_1"
+				(pin passive line
+					(at -3.81 0 0)
+					(length 2.54)
+					(name "K"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 3.81 0 180)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Device:L"
 			(pin_numbers
 				(hide yes)
@@ -939,232 +1127,6 @@
 						)
 					)
 					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
-		(symbol "Diode:BAV70"
-			(pin_names
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "D"
-				(at 0.635 -2.54 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Value" "BAV70"
-				(at 0 2.54 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/BAV70_SER.pdf"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Dual 100V 215mA high-speed switching diodes, common cathode, SOT-23"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "diode"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "SOT?23*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "BAV70_0_1"
-				(polyline
-					(pts
-						(xy -3.81 1.27) (xy -1.27 0) (xy -3.81 -1.27) (xy -3.81 1.27) (xy -3.81 1.27) (xy -3.81 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -3.81 0) (xy 3.81 0)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.27 -1.27) (xy -1.27 1.27) (xy -1.27 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 0) (xy 0 -2.54)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 0 0)
-					(radius 0.254)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.27 -1.27) (xy 1.27 1.27) (xy 1.27 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 3.81 -1.27) (xy 1.27 0) (xy 3.81 1.27) (xy 3.81 -1.27) (xy 3.81 -1.27) (xy 3.81 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -7.62 0 0)
-					(length 3.81)
-					(name "A"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 7.62 0 180)
-					(length 3.81)
-					(name "A"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -5.08 90)
-					(length 2.54)
-					(name "K"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2758,12 +2720,6 @@
 		(uuid "2a4c7065-d23b-43d7-a9d3-a578e9566a7f")
 	)
 	(junction
-		(at 54.61 132.08)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "2e49a1aa-a681-469b-a114-24d0cecc60c4")
-	)
-	(junction
 		(at 205.74 147.32)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2836,6 +2792,12 @@
 		(uuid "9db3b676-e816-4fca-a97e-991de15bcc03")
 	)
 	(junction
+		(at 66.04 132.08)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "b5694316-1b8b-4765-b3c4-b0f9168f1f0a")
+	)
+	(junction
 		(at 129.54 127)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2881,7 +2843,7 @@
 	)
 	(wire
 		(pts
-			(xy 262.89 68.58) (xy 273.05 68.58)
+			(xy 251.46 66.04) (xy 261.62 66.04)
 		)
 		(stroke
 			(width 0)
@@ -2918,6 +2880,16 @@
 			(type default)
 		)
 		(uuid "0af44e50-be37-484b-a3c7-9b2878526cdb")
+	)
+	(wire
+		(pts
+			(xy 66.04 116.84) (xy 66.04 132.08)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0c0c3d07-f43e-495c-beb5-4e5013f00c24")
 	)
 	(wire
 		(pts
@@ -2981,7 +2953,7 @@
 	)
 	(wire
 		(pts
-			(xy 262.89 50.8) (xy 273.05 50.8)
+			(xy 251.46 48.26) (xy 261.62 48.26)
 		)
 		(stroke
 			(width 0)
@@ -3008,16 +2980,6 @@
 			(type default)
 		)
 		(uuid "20d6fbfc-86c4-432b-a9db-c976b21c3d84")
-	)
-	(wire
-		(pts
-			(xy 64.77 139.7) (xy 54.61 139.7)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "2543e347-c387-43c6-bf89-688e8cacbcbb")
 	)
 	(wire
 		(pts
@@ -3061,23 +3023,13 @@
 	)
 	(wire
 		(pts
-			(xy 262.89 48.26) (xy 273.05 48.26)
+			(xy 251.46 45.72) (xy 261.62 45.72)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "32137547-b8fb-4c06-a65d-3c96e62f93e9")
-	)
-	(wire
-		(pts
-			(xy 54.61 124.46) (xy 54.61 132.08)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "34b231ec-cee5-4aab-9f93-9dd917dbdfc6")
 	)
 	(wire
 		(pts
@@ -3088,16 +3040,6 @@
 			(type default)
 		)
 		(uuid "34e7399f-0c4c-4ed7-8bdd-c5d9fee64f28")
-	)
-	(wire
-		(pts
-			(xy 64.77 124.46) (xy 54.61 124.46)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "37bf5177-d16a-4027-b922-d4d45dd0d3c8")
 	)
 	(wire
 		(pts
@@ -3128,16 +3070,6 @@
 			(type default)
 		)
 		(uuid "49fcf1e4-d55c-4093-80b3-3c42a73ecd34")
-	)
-	(wire
-		(pts
-			(xy 69.85 132.08) (xy 71.12 132.08)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4a3b7b1d-cc72-4c34-8a05-2594c5b03791")
 	)
 	(wire
 		(pts
@@ -3181,7 +3113,7 @@
 	)
 	(wire
 		(pts
-			(xy 262.89 71.12) (xy 273.05 71.12)
+			(xy 251.46 68.58) (xy 261.62 68.58)
 		)
 		(stroke
 			(width 0)
@@ -3211,7 +3143,7 @@
 	)
 	(wire
 		(pts
-			(xy 262.89 55.88) (xy 273.05 55.88)
+			(xy 251.46 53.34) (xy 261.62 53.34)
 		)
 		(stroke
 			(width 0)
@@ -3228,16 +3160,6 @@
 			(type default)
 		)
 		(uuid "69cb8057-6589-4353-862a-287492ef5417")
-	)
-	(wire
-		(pts
-			(xy 54.61 139.7) (xy 54.61 132.08)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6dfdc0bf-4a40-42d4-90c5-a202945a682a")
 	)
 	(wire
 		(pts
@@ -3301,7 +3223,7 @@
 	)
 	(wire
 		(pts
-			(xy 54.61 132.08) (xy 50.8 132.08)
+			(xy 50.8 132.08) (xy 57.15 132.08)
 		)
 		(stroke
 			(width 0)
@@ -3451,6 +3373,16 @@
 	)
 	(wire
 		(pts
+			(xy 64.77 132.08) (xy 66.04 132.08)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b73ffbde-6bf3-458a-85ad-ef7fafc25e1f")
+	)
+	(wire
+		(pts
 			(xy 57.15 63.5) (xy 45.72 63.5)
 		)
 		(stroke
@@ -3521,7 +3453,7 @@
 	)
 	(wire
 		(pts
-			(xy 262.89 53.34) (xy 273.05 53.34)
+			(xy 251.46 50.8) (xy 261.62 50.8)
 		)
 		(stroke
 			(width 0)
@@ -3681,6 +3613,16 @@
 	)
 	(wire
 		(pts
+			(xy 66.04 132.08) (xy 71.12 132.08)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e637c9b2-7abf-4788-bed6-ab4f9e961440")
+	)
+	(wire
+		(pts
 			(xy 77.47 52.07) (xy 88.9 52.07)
 		)
 		(stroke
@@ -3721,7 +3663,7 @@
 	)
 	(wire
 		(pts
-			(xy 262.89 73.66) (xy 273.05 73.66)
+			(xy 251.46 71.12) (xy 261.62 71.12)
 		)
 		(stroke
 			(width 0)
@@ -3751,7 +3693,7 @@
 	)
 	(wire
 		(pts
-			(xy 262.89 66.04) (xy 273.05 66.04)
+			(xy 251.46 63.5) (xy 261.62 63.5)
 		)
 		(stroke
 			(width 0)
@@ -3812,7 +3754,7 @@
 		(uuid "06dc2b5a-a8c0-4438-b1bb-aca938497b7c")
 	)
 	(label "Tx"
-		(at 262.89 55.88 180)
+		(at 251.46 53.34 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3860,7 +3802,7 @@
 		(uuid "14b1510d-4a04-4250-8e39-48da14508204")
 	)
 	(label "GND"
-		(at 262.89 71.12 180)
+		(at 251.46 68.58 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3883,8 +3825,20 @@
 		)
 		(uuid "41537d82-d101-4d65-98da-18c576192aca")
 	)
+	(label "+24_V"
+		(at 220.98 55.88 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "42c871f8-1897-4778-8cec-d8dbba5c5868")
+	)
 	(label "+24V"
-		(at 262.89 73.66 180)
+		(at 251.46 71.12 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3908,7 +3862,7 @@
 		(uuid "488db131-ed12-4af5-8fdf-48738b11fca4")
 	)
 	(label "GND"
-		(at 262.89 48.26 180)
+		(at 251.46 45.72 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3943,20 +3897,8 @@
 		)
 		(uuid "69d9f1ef-f709-4937-a275-0f57bc1fb112")
 	)
-	(label "+24V"
-		(at 220.98 55.88 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-				(thickness 0.254)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "7397dedc-8cd1-45d6-9cff-0a27b10ad449")
-	)
 	(label "LIN"
-		(at 262.89 68.58 180)
+		(at 251.46 66.04 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3979,6 +3921,18 @@
 		)
 		(uuid "9890f373-af1b-491c-86d3-aa3bae38d7e2")
 	)
+	(label "+24_V"
+		(at 66.04 116.84 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "a222b6bf-a0b2-410e-8cbf-8a0a5f0903ff")
+	)
 	(label "InGas"
 		(at 88.9 57.15 0)
 		(effects
@@ -3992,7 +3946,7 @@
 		(uuid "a4d1469e-6d17-431b-8401-57540a93a2b5")
 	)
 	(label "+5v"
-		(at 262.89 50.8 180)
+		(at 251.46 48.26 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4028,7 +3982,7 @@
 		(uuid "d935c422-f786-4ece-8f07-268e04ecb2f7")
 	)
 	(label "UPDI"
-		(at 262.89 53.34 180)
+		(at 251.46 50.8 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4052,7 +4006,7 @@
 		(uuid "e13db009-69d8-4527-8311-f2d4bb2aabc9")
 	)
 	(label "OUT"
-		(at 262.89 66.04 180)
+		(at 251.46 63.5 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4146,6 +4100,12 @@
 			(uuid "0834bef7-f44a-4975-93f4-71455e58f2a7")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "#PWR019")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "#PWR019")
@@ -4156,7 +4116,7 @@
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x04_Pin")
-		(at 278.13 71.12 180)
+		(at 266.7 68.58 180)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -4166,7 +4126,7 @@
 		(dnp no)
 		(uuid "1e05b763-b919-4244-aafe-6bf24294f9cb")
 		(property "Reference" "J4"
-			(at 277.622 63.246 0)
+			(at 266.192 60.706 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -4176,7 +4136,7 @@
 			)
 		)
 		(property "Value" "Conn_01x04_Pin"
-			(at 277.495 76.2 0)
+			(at 266.065 73.66 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4187,7 +4147,7 @@
 			)
 		)
 		(property "Footprint" "Connector_Pin:AMP SEAL 3.00mm_4p"
-			(at 278.13 71.12 0)
+			(at 266.7 68.58 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4198,7 +4158,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 278.13 71.12 0)
+			(at 266.7 68.58 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4209,7 +4169,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x04, script generated"
-			(at 278.13 71.12 0)
+			(at 266.7 68.58 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4232,6 +4192,12 @@
 			(uuid "57ea7360-026f-4acf-9675-d2fab9988c8a")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "J4")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "J4")
@@ -4311,6 +4277,12 @@
 			(uuid "9c490027-c0a5-46fd-8c90-7fc864f77a07")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "R17")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "R17")
@@ -4391,6 +4363,12 @@
 			(uuid "16b6e2f8-1645-4510-8759-d3c03bc3576c")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "L2")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "L2")
@@ -4492,6 +4470,12 @@
 			(uuid "9681e4fd-441c-4627-8f38-38cfeeb62142")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "U7")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "U7")
@@ -4571,6 +4555,12 @@
 			(uuid "55643f93-1876-4dc9-9be3-fa0b049941a4")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "#PWR013")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "#PWR013")
@@ -4650,6 +4640,12 @@
 			(uuid "3e5d3c3a-b28e-495c-8de6-e87a62071180")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "#PWR017")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "#PWR017")
@@ -4731,6 +4727,12 @@
 			(uuid "96190f92-3a3c-4bca-b7db-d4eca99f19bd")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "C7")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "C7")
@@ -4810,6 +4812,12 @@
 			(uuid "2dc72fb7-3431-431d-9928-ef8dfd99a70a")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "R23")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "R23")
@@ -4889,6 +4897,12 @@
 			(uuid "2aad229a-63f9-4d7b-87a1-2a8ed85b52b1")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "R15")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "R15")
@@ -4979,6 +4993,12 @@
 			(uuid "ab1b50e6-8067-4246-a5e8-3cde8b90ff3f")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "D6")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "D6")
@@ -5070,6 +5090,12 @@
 			(uuid "abd85d3f-41d4-4307-a76d-679c09091770")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "U6")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "U6")
@@ -5151,6 +5177,12 @@
 			(uuid "a24c8967-08f0-421b-a4b6-7b1ea211bfe3")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "R24")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "R24")
@@ -5230,6 +5262,12 @@
 			(uuid "a45c5782-c6e9-4b8d-9ab5-f399baf4bb6a")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "#PWR012")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "#PWR012")
@@ -5311,6 +5349,12 @@
 			(uuid "1b3768b6-f510-447e-917d-901b7e3bfe0f")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "R21")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "R21")
@@ -5392,6 +5436,12 @@
 			(uuid "dbd16d51-5c1a-4a36-9913-4cc7bcac533b")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "C6")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "C6")
@@ -5473,6 +5523,12 @@
 			(uuid "fc7c2fd9-9eb9-485b-a73a-e1156c3f905b")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "D5")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "D5")
@@ -5552,6 +5608,12 @@
 			(uuid "ba025673-498e-4d26-8339-277989d2ac2d")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "#PWR011")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "#PWR011")
@@ -5631,6 +5693,12 @@
 			(uuid "c7fbd653-2fb5-457f-9120-f7aa1eca4791")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "R16")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "R16")
@@ -5710,6 +5778,12 @@
 			(uuid "3bf9f65c-c593-4a1e-afd6-6c963b3b14d0")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "#PWR016")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "#PWR016")
@@ -5791,6 +5865,12 @@
 			(uuid "62ce65fe-253c-4103-bc6d-3beae0f12f87")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "C12")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "C12")
@@ -5872,6 +5952,12 @@
 			(uuid "3866b544-a15f-4062-858a-d86569f5dc55")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "C11")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "C11")
@@ -5960,6 +6046,12 @@
 			(uuid "54a3f227-03bf-475e-a154-8ac59839d022")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "U8")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "U8")
@@ -6039,6 +6131,12 @@
 			(uuid "cb48bd46-bf52-48ca-8502-787bd84d58b0")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "#PWR018")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "#PWR018")
@@ -6121,94 +6219,15 @@
 			(uuid "44156712-d59c-4254-befd-5708b4166e68")
 		)
 		(instances
-			(project "Датчик утечки газа 2026"
-				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
 					(reference "R19")
 					(unit 1)
 				)
 			)
-		)
-	)
-	(symbol
-		(lib_id "Diode:BAV70")
-		(at 64.77 132.08 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "ccae90b1-f0f5-45b2-99b7-934e1de4de04")
-		(property "Reference" "D4"
-			(at 62.23 130.8099 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "BAV70"
-			(at 62.23 133.3499 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
-			(at 64.77 132.08 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/BAV70_SER.pdf"
-			(at 64.77 132.08 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Dual 100V 215mA high-speed switching diodes, common cathode, SOT-23"
-			(at 64.77 132.08 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "2"
-			(uuid "3d97ce73-1965-4f2e-97d7-8a40d7a7a13f")
-		)
-		(pin "1"
-			(uuid "d41fc763-a471-4281-afcd-2d0e22ace0c3")
-		)
-		(pin "3"
-			(uuid "580bc164-c1e9-4e20-984b-f9d22ee1e2f8")
-		)
-		(instances
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
-					(reference "D4")
+					(reference "R19")
 					(unit 1)
 				)
 			)
@@ -6285,6 +6304,12 @@
 			(uuid "6753fd1d-cc96-43da-a775-5c3c75a0d012")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "#PWR015")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "#PWR015")
@@ -6385,6 +6410,12 @@
 			(uuid "7bcc0837-8b2e-4059-a528-8915afbce902")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "U5")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "U5")
@@ -6466,6 +6497,12 @@
 			(uuid "633b5ddc-03f4-4070-8fa7-a6837d3d3a5e")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "C8")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "C8")
@@ -6545,6 +6582,12 @@
 			(uuid "4aa9d142-dc8f-4a67-b1ff-ef02e6216a62")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "C10")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "C10")
@@ -6555,7 +6598,7 @@
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x04_Pin")
-		(at 278.13 50.8 0)
+		(at 266.7 48.26 0)
 		(mirror y)
 		(unit 1)
 		(body_style 1)
@@ -6566,7 +6609,7 @@
 		(dnp yes)
 		(uuid "ea7979a1-98b3-4332-94db-54e3cb812a6c")
 		(property "Reference" "J3"
-			(at 277.876 45.974 0)
+			(at 266.446 43.434 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -6576,7 +6619,7 @@
 			)
 		)
 		(property "Value" "Conn_01x04_Pin"
-			(at 277.495 45.72 0)
+			(at 266.065 43.18 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6587,7 +6630,7 @@
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_1.27mm:PinHeader_1x04_P1.27mm_Vertical"
-			(at 278.13 50.8 0)
+			(at 266.7 48.26 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6598,7 +6641,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 278.13 50.8 0)
+			(at 266.7 48.26 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6609,7 +6652,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x04, script generated"
-			(at 278.13 50.8 0)
+			(at 266.7 48.26 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6632,6 +6675,12 @@
 			(uuid "9ad12458-ae6a-4fd7-9dc0-3f3c1248d53f")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "J3")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "J3")
@@ -6713,9 +6762,116 @@
 			(uuid "23f1eb40-7486-483a-98a1-7c7e51d47a19")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "C9")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "C9")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D")
+		(at 60.96 132.08 180)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "f1a5f41d-db6e-4015-9179-257f7a300a3b")
+		(property "Reference" "D8"
+			(at 60.96 125.73 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "MBRA360"
+			(at 59.182 128.27 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Diode_SMD:D_SMA"
+			(at 60.96 132.08 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 60.96 132.08 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Diode"
+			(at 60.96 132.08 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Sim.Device" "MBRA360, Диод Шоттки 60В 3А [SMA / DO-214AC]"
+			(at 60.96 132.08 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Sim.Pins" "1=K 2=A"
+			(at 60.96 132.08 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "c8af7474-84d5-42bd-8c79-49209d7f4cde")
+		)
+		(pin "2"
+			(uuid "43b575a2-1953-4ebe-af8e-b2b46f73546f")
+		)
+		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "D8")
 					(unit 1)
 				)
 			)
@@ -6944,6 +7100,12 @@
 			(uuid "6c14d14f-f409-43f4-97e5-ff390fc05052")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "U4")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "U4")
@@ -7023,6 +7185,12 @@
 			(uuid "0ba064f3-0f85-4e3b-93cb-84804cbeb573")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "#PWR014")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "#PWR014")
@@ -7104,6 +7272,12 @@
 			(uuid "044f5c42-46c5-42f0-a053-beb241fb27c8")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "R22")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "R22")
@@ -7183,6 +7357,12 @@
 			(uuid "4ad88fd5-c0db-44ec-9160-a3c72753da0a")
 		)
 		(instances
+			(project "Var_LIN"
+				(path "/7ba6580f-d6de-4a31-bf3e-7919f02a8856"
+					(reference "R20")
+					(unit 1)
+				)
+			)
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c/5b8447ab-854c-4557-a5fd-39e271aa8951"
 					(reference "R20")
@@ -7191,4 +7371,10 @@
 			)
 		)
 	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
 )

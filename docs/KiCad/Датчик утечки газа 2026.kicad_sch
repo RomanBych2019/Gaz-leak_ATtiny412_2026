@@ -1335,6 +1335,194 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Device:D"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "D"
+				(at 0 2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "D"
+				(at 0 -2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Diode"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Sim.Device" "D"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Sim.Pins" "1=K 2=A"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "diode"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "TO-???* *_Diode_* *SingleDiode* D_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "D_0_1"
+				(polyline
+					(pts
+						(xy -1.27 1.27) (xy -1.27 -1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 1.27) (xy 1.27 -1.27) (xy -1.27 0) (xy 1.27 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 0) (xy -1.27 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "D_1_1"
+				(pin passive line
+					(at -3.81 0 0)
+					(length 2.54)
+					(name "K"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 3.81 0 180)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Device:L"
 			(pin_numbers
 				(hide yes)
@@ -1844,232 +2032,6 @@
 						)
 					)
 					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
-		(symbol "Diode:BAV70"
-			(pin_names
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "D"
-				(at 0.635 -2.54 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Value" "BAV70"
-				(at 0 2.54 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/BAV70_SER.pdf"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Dual 100V 215mA high-speed switching diodes, common cathode, SOT-23"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "diode"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "SOT?23*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "BAV70_0_1"
-				(polyline
-					(pts
-						(xy -3.81 1.27) (xy -1.27 0) (xy -3.81 -1.27) (xy -3.81 1.27) (xy -3.81 1.27) (xy -3.81 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -3.81 0) (xy 3.81 0)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.27 -1.27) (xy -1.27 1.27) (xy -1.27 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 0) (xy 0 -2.54)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 0 0)
-					(radius 0.254)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.27 -1.27) (xy 1.27 1.27) (xy 1.27 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 3.81 -1.27) (xy 1.27 0) (xy 3.81 1.27) (xy 3.81 -1.27) (xy 3.81 -1.27) (xy 3.81 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -7.62 0 0)
-					(length 3.81)
-					(name "A"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 7.62 0 180)
-					(length 3.81)
-					(name "A"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -5.08 90)
-					(length 2.54)
-					(name "K"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -3532,6 +3494,12 @@
 		(uuid "257f9fb4-0384-4540-9802-db42e665d10d")
 	)
 	(junction
+		(at 58.42 129.54)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "2891e327-afdd-4bc7-bc1f-6212c5ef1fd1")
+	)
+	(junction
 		(at 83.82 139.7)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3578,12 +3546,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "a2fe4afc-1389-4566-af4c-3b9b88af4557")
-	)
-	(junction
-		(at 45.72 129.54)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "a333e245-1943-4c67-8d5d-8cce0f452e71")
 	)
 	(junction
 		(at 83.82 129.54)
@@ -3833,16 +3795,6 @@
 	)
 	(wire
 		(pts
-			(xy 45.72 137.16) (xy 45.72 129.54)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4334c229-aaaa-4fba-83cf-f1f5880d5f55")
-	)
-	(wire
-		(pts
 			(xy 83.82 139.7) (xy 88.9 139.7)
 		)
 		(stroke
@@ -3920,16 +3872,6 @@
 			(type default)
 		)
 		(uuid "4f2a89c9-ee86-456b-aca2-ad699f0b8db5")
-	)
-	(wire
-		(pts
-			(xy 60.96 129.54) (xy 62.23 129.54)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5449e833-b649-4c55-b726-e9ce6b99d95c")
 	)
 	(wire
 		(pts
@@ -4143,6 +4085,16 @@
 	)
 	(wire
 		(pts
+			(xy 58.42 129.54) (xy 62.23 129.54)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "78cce61e-0761-49f8-8f0c-b170e6f13f6a")
+	)
+	(wire
+		(pts
 			(xy 224.79 33.02) (xy 243.84 33.02)
 		)
 		(stroke
@@ -4203,7 +4155,7 @@
 	)
 	(wire
 		(pts
-			(xy 45.72 129.54) (xy 41.91 129.54)
+			(xy 41.91 129.54) (xy 49.53 129.54)
 		)
 		(stroke
 			(width 0)
@@ -4243,6 +4195,16 @@
 	)
 	(wire
 		(pts
+			(xy 59.69 113.03) (xy 58.42 113.03)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "97fc2223-877c-4568-b7fa-8c0f62b12d8f")
+	)
+	(wire
+		(pts
 			(xy 227.33 115.57) (xy 237.49 115.57)
 		)
 		(stroke
@@ -4250,16 +4212,6 @@
 			(type default)
 		)
 		(uuid "9939d08f-f6ff-4b97-8399-200929600ba0")
-	)
-	(wire
-		(pts
-			(xy 45.72 121.92) (xy 45.72 129.54)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "9a2b1525-a14a-4b23-9841-33f3fc84b182")
 	)
 	(wire
 		(pts
@@ -4300,26 +4252,6 @@
 			(type default)
 		)
 		(uuid "a8f16549-3117-449e-8c39-4fd3e7b64359")
-	)
-	(wire
-		(pts
-			(xy 55.88 121.92) (xy 45.72 121.92)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "aa061b80-942c-487b-a326-62af5e0d1214")
-	)
-	(wire
-		(pts
-			(xy 55.88 137.16) (xy 45.72 137.16)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "aa5347d6-1c22-46cd-af57-d99dab979fc6")
 	)
 	(wire
 		(pts
@@ -4463,6 +4395,16 @@
 	)
 	(wire
 		(pts
+			(xy 58.42 113.03) (xy 58.42 129.54)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d52da9bd-0adb-4e0c-8ba9-a6b841b57196")
+	)
+	(wire
+		(pts
 			(xy 64.77 63.5) (xy 77.47 63.5)
 		)
 		(stroke
@@ -4603,6 +4545,16 @@
 	)
 	(wire
 		(pts
+			(xy 57.15 129.54) (xy 58.42 129.54)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f908c375-f01b-4a57-99ab-67d934bd3701")
+	)
+	(wire
+		(pts
 			(xy 77.47 52.07) (xy 88.9 52.07)
 		)
 		(stroke
@@ -4643,6 +4595,18 @@
 		)
 		(uuid "031069e8-ab91-41ef-8259-334edde07ed7")
 	)
+	(label "+24_V"
+		(at 59.69 113.03 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "09b4d70c-ddc1-4e01-8270-dd23127b5a72")
+	)
 	(label "GND"
 		(at 227.33 115.57 180)
 		(effects
@@ -4667,18 +4631,6 @@
 		)
 		(uuid "1aee3c87-9aee-4811-ad19-5fa1aab2826f")
 	)
-	(label "+24V"
-		(at 254 33.02 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-				(thickness 0.254)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "2c784287-bb94-4d70-811c-d6d45d4fbeb3")
-	)
 	(label "UPDI"
 		(at 185.42 50.8 0)
 		(effects
@@ -4690,6 +4642,30 @@
 			(justify left bottom)
 		)
 		(uuid "39d8f4ec-1768-4f03-bd36-dc3646610946")
+	)
+	(label "+24_V"
+		(at 254 60.96 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "3b66e3fb-9c55-4eb6-ba50-4f4f153ed06b")
+	)
+	(label "+24_V"
+		(at 254 33.02 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "4e06217a-afdc-465c-86f3-157bd6c57e4a")
 	)
 	(label "+5v"
 		(at 88.9 52.07 0)
@@ -4810,18 +4786,6 @@
 			(justify left bottom)
 		)
 		(uuid "c0cb5842-2078-41f9-891b-3d2050655757")
-	)
-	(label "+24V"
-		(at 254 60.96 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-				(thickness 0.254)
-				(bold yes)
-			)
-			(justify left bottom)
-		)
-		(uuid "cf287be0-e77b-4bbd-ba1a-90ce5cdba54a")
 	)
 	(label "UPDI"
 		(at 227.33 120.65 180)
@@ -5994,91 +5958,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Diode:BAV70")
-		(at 55.88 129.54 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "59e6011d-c09a-4efb-9773-71a8d42cd4e6")
-		(property "Reference" "D1"
-			(at 53.34 128.2699 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "BAV70"
-			(at 53.34 130.8099 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
-			(at 55.88 129.54 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/BAV70_SER.pdf"
-			(at 55.88 129.54 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Dual 100V 215mA high-speed switching diodes, common cathode, SOT-23"
-			(at 55.88 129.54 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "2"
-			(uuid "adadb26a-3107-47d7-9681-4c31a3a52068")
-		)
-		(pin "1"
-			(uuid "9aa6a318-35cd-40f0-8529-cacfcf996998")
-		)
-		(pin "3"
-			(uuid "9627cdd8-b7b8-4698-9974-905ab7bf4e33")
-		)
-		(instances
-			(project "Датчик утечки газа 2026"
-				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c"
-					(reference "D1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 212.09 83.82 0)
 		(unit 1)
@@ -6152,6 +6031,107 @@
 			(project "Датчик утечки газа 2026"
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c"
 					(reference "#PWR07")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D")
+		(at 53.34 129.54 180)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "6e64e308-348b-4b20-986e-0e4bae16981e")
+		(property "Reference" "D8"
+			(at 53.34 123.19 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "MBRA360"
+			(at 51.562 125.73 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Diode_SMD:D_SMA"
+			(at 53.34 129.54 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 53.34 129.54 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Diode"
+			(at 53.34 129.54 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Sim.Device" "MBRA360, Диод Шоттки 60В 3А [SMA / DO-214AC]"
+			(at 53.34 129.54 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Sim.Pins" "1=K 2=A"
+			(at 53.34 129.54 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "908d2133-128d-45f9-bc62-0a1dca5fe3d3")
+		)
+		(pin "2"
+			(uuid "181ecade-a681-4b51-b686-5a87ade2eb6e")
+		)
+		(instances
+			(project "Датчик утечки газа 2026"
+				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c"
+					(reference "D8")
 					(unit 1)
 				)
 			)
@@ -8545,52 +8525,6 @@
 				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c"
 					(reference "#PWR010")
 					(unit 1)
-				)
-			)
-		)
-	)
-	(sheet
-		(at 18.796 163.576)
-		(size 28.194 23.114)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(fill
-			(color 0 0 0 0)
-		)
-		(uuid "5b8447ab-854c-4557-a5fd-39e271aa8951")
-		(property "Sheetname" "Ver_LIN"
-			(at 18.796 162.8644 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Sheetfile" "Var_LIN.kicad_sch"
-			(at 18.796 187.2746 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left top)
-			)
-		)
-		(instances
-			(project "Датчик утечки газа 2026"
-				(path "/a17a5c65-2c8f-4811-931f-2f1634edc76c"
-					(page "2")
 				)
 			)
 		)
