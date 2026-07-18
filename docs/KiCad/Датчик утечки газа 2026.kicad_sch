@@ -3429,6 +3429,16 @@
 		)
 		(uuid "c639278d-5c25-4555-8b4c-fa035691818d")
 	)
+	(text "4,7В"
+		(exclude_from_sim no)
+		(at 134.874 118.618 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "4c294f7e-cf58-4bd6-a747-f13ea6c27652")
+	)
 	(text "max 1.5A"
 		(exclude_from_sim no)
 		(at 250.698 52.324 0)
@@ -8321,7 +8331,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "88k"
+		(property "Value" "82k"
 			(at 131.318 124.968 0)
 			(show_name no)
 			(do_not_autoplace no)

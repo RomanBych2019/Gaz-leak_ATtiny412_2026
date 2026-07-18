@@ -2703,6 +2703,16 @@
 		)
 		(uuid "99e32b9b-8705-490b-85ea-fad05d38ac10")
 	)
+	(text "4,7В"
+		(exclude_from_sim no)
+		(at 147.828 120.904 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "a75af53d-7548-4b24-b838-0d32c3fed68f")
+	)
 	(text "Микроконтроллер      Выходной каскад"
 		(exclude_from_sim no)
 		(at 172.974 19.812 0)
@@ -5250,7 +5260,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "88k"
+		(property "Value" "82k"
 			(at 140.208 127.508 0)
 			(show_name no)
 			(do_not_autoplace no)
