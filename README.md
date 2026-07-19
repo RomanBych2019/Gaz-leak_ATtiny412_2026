@@ -1,20 +1,49 @@
-# ATtiny412 gas sensor controller
+# Контроллер датчика газа на ATtiny412
 
-Pin assignment:
+Назначение выводов:
 
 - PA0: UPDI
-- PA1: board status LED
-- PA2: ADC sensor input with external 4.7 kOhm pull-down to GND
-- PA3: debug TX, software UART 1200 baud
-- PA6: power switch output 1
-- PA7: power switch output 2
+- PA1: светодиод состояния платы
+- PA2: вход АЦП датчика с внешней подтяжкой 4.7 кОм к GND
+- PA3: отладочный TX, программный UART 2400 бод
+- PA6: выход силового ключа 2
+- PA7: выход силового ключа 1
 
-Main behavior:
+Основная логика:
 
-- no calibration after warmup;
-- sensor open or line to GND is detected by ADC near 0 V;
-- sensor output shorted to supply is detected by ADC near +5 V;
-- ALARM state is latched until controller power cycle;
-- other states are recoverable.
+- после прогрева калибровка не выполняется;
+- обрыв датчика или замыкание линии на GND определяется по АЦП около 0 В;
+- замыкание выхода датчика на питание определяется по АЦП около +5 В;
+- состояние ALARM защелкивается до перезапуска питания контроллера;
+- остальные состояния являются восстанавливаемыми.
 
-Change `SENSOR_MODIFICATION` in `src/main.cpp` to select PA6/PA7 behavior.
+Для выбора поведения PA6/PA7 измените `SENSOR_MODIFICATION` в `src/main.cpp`.
+
+Варианты сборки:
+
+- `attiny412`: распиновка базовой платы;
+- `attiny412_lin`: распиновка платы с LIN-драйвером, сборка с `LIN_DRIVER`.
+
+Команды:
+
+```sh
+pio run -e attiny412
+pio run -e attiny412_lin
+pio run -e attiny412_lin -t upload
+```
+
+LIN-вариант:
+
+- трансивер: TLIN2029ADRBRQ1;
+- скорость обмена: 19200 бод;
+
+- PA0: UPDI
+- PA1: LIN TXD
+- PA2: LIN RXD 
+- PA3: светодиод состояния платы/отладочный TX, программный UART 2400 бод
+- PA6: вход АЦП датчика с внешней подтяжкой 4.7 кОм к GND
+- PA7: выход силового ключа
+
+- статусный кадр: LIN ID `0x12`, PID `0x92`, enhanced checksum;
+- данные ответа: `state`, `flags`, `adc_l`, `adc_h`;
+- `flags`: bit0 = ALARM защелкнут, bit1 = выход PA7 активен, bit2 = неисправность датчика, bit3 = прогрев.

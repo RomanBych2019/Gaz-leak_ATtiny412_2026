@@ -4,11 +4,11 @@
 // Контроллер датчика газа на ATtiny412
 // ============================================================
 // PA0 - UPDI, не использовать как GPIO
-// PA1 - светодиод состояния платы
-// PA2 - вход АЦП датчика, внешняя подтяжка 4.7 кОм к GND
-// PA3 - отладочный TX, программный UART 9600 бод
-// PA6 - выход силового ключа 1
-// PA7 - выход силового ключа 2
+// PA1 - светодиод состояния платы / LIN TX в версии LIN_DRIVER
+// PA2 - вход АЦП датчика / LIN RX в версии LIN_DRIVER
+// PA3 - отладочный TX, программный UART 9600 бод / светодиод в версии LIN_DRIVER
+// PA6 - выход силового ключа 2
+// PA7 - выход силового ключа 1 / единственный активный выход в версии LIN_DRIVER
 //
 // Логика:
 // - напряжение датчика проверяется по фиксированным порогам АЦП
@@ -18,28 +18,42 @@
 // - остальные состояния могут вернуться в NORMAL, когда АЦП вернется в допустимый диапазон
 // ============================================================
 
-// #define DEBUG
-// #define LIN_DRIVER
+#ifndef DEBUG
+#define DEBUG 0
+#endif
 
 #ifndef LIN_DRIVER
+#define LIN_DRIVER 0
+#endif
+
+#if !LIN_DRIVER
 #define LED_PIN       PIN_PA1
 #define SENSOR_PIN    PIN_PA2
 #define DEBUG_TX_PIN  PIN_PA3
-#define KEY1_PIN      PIN_PA6
-#define KEY2_PIN      PIN_PA7
+#define KEY1_PIN      PIN_PA7
+#define KEY2_PIN      PIN_PA6
 #else
 #define LED_PIN       PIN_PA3
 #define SENSOR_PIN    PIN_PA6
-#define DEBUG_TX_PIN  PIN_PA3 
-#define KEY1_PIN      PIN_PA7
-#define KEY2_PIN      PIN_PA7
+#define DEBUG_TX_PIN  PIN_PA3
+#define KEY_PIN       PIN_PA7
+#define LIN_RX_PIN    PIN_PA2
+#define LIN_TX_PIN    PIN_PA1
 #endif
+
+#if DEBUG && LIN_DRIVER
+// В LIN-версии PA3 используется светодиодом, но при DEBUG приоритет у
+// отладочного TX на PA3, поэтому индикация светодиодом отключается.
+#define LED_ENABLED   0
+#else
+#define LED_ENABLED   1
+#endif
+
 // ============================================================
 // Отладочный программный UART на PA3
 // ============================================================
 
-
-#ifdef DEBUG
+#if DEBUG
 
 const uint32_t  DEBUG_BAUD = 2400;
 const uint16_t  BIT_TIME_US = (1000000UL / DEBUG_BAUD);
@@ -142,15 +156,15 @@ const uint16_t GAS_ALARM_OFF_ADC = 580;
 // Диагностические пороги напряжения датчика
 // ============================================================
 //
-// На PA2 установлена внешняя подтяжка 4.7 кОм к GND.
+// На входе датчика SENSOR_PIN установлена внешняя подтяжка 4.7 кОм к GND.
 //
 // ADC <= ADC_SENSOR_OPEN_OR_GND_ON:
 //   датчик оборван или линия датчика подключена к GND.
-//   напряжение на PA2 около 0 В.
+//   напряжение на SENSOR_PIN около 0 В.
 //
 // ADC >= ADC_SENSOR_SHORT_TO_VCC_ON:
 //   выход датчика замкнут на питание.
-//   напряжение на PA2 около +5 В.
+//   напряжение на SENSOR_PIN около +5 В.
 //
 // Пороги OFF задают гистерезис для возврата из состояний неисправности.
 
@@ -167,6 +181,37 @@ const uint16_t ADC_SENSOR_SHORT_TO_VCC_OFF = 970;
 // ADC 1000 ~= 4.89 V
 
 // ============================================================
+// LIN interface
+// ============================================================
+//
+// TLIN2029ADRBRQ1 - это физический LIN-трансивер. Протокол LIN
+// обслуживает ATtiny412 через USART0:
+// - TXD трансивера <- PA1 / LIN_TX_PIN
+// - RXD трансивера -> PA2 / LIN_RX_PIN
+//
+// Узел работает как LIN slave и отвечает на header с PID 0x92
+// (LIN ID 0x12) статусным кадром:
+// byte 0: SystemState
+// byte 1: flags, bit0=alarmLatched, bit1=outputActive, bit2=fault, bit3=warmup
+// byte 2: filteredAdc low byte
+// byte 3: filteredAdc high byte
+
+#if LIN_DRIVER
+const uint32_t LIN_BAUD = 19200UL;
+const uint8_t LIN_STATUS_ID = 0x12;
+const uint8_t LIN_STATUS_DATA_LEN = 4;
+const uint8_t LIN_HEADER_TIMEOUT_MS = 10;
+
+enum LinRxState {
+  LIN_WAIT_SYNC,
+  LIN_WAIT_PID
+};
+
+LinRxState linRxState = LIN_WAIT_SYNC;
+uint32_t lastLinByteMs = 0;
+#endif
+
+// ============================================================
 // Состояния системы
 // ============================================================
 
@@ -180,25 +225,42 @@ enum SystemState {
 
 SystemState systemState = STATE_WARMUP;
 
+uint16_t filteredAdc = 0;
+
+// Защелка ALARM. Хранится в RAM, поэтому сбрасывается после отключения питания.
+// Примечание: аппаратный сброс или сброс watchdog также очищает RAM при обычном старте.
+bool alarmLatched = false;
+
+struct OutputState {
+#if !LIN_DRIVER
+  bool key1;
+  bool key2;
+#else
+  bool key;
+#endif
+};
+
+#if !LIN_DRIVER
+
 // ============================================================
 // Варианты поведения PA6 / PA7
 // ============================================================
 //
 // MOD_SINGLE_HIGH:
 //   NORMAL       PA6=0, PA7=0
-//   ALARM        PA6=1, PA7=0
+//   ALARM        PA6=0, PA7=1
 //
 // MOD_SINGLE_LOW:
 //   NORMAL       PA6=0, PA7=0
-//   ALARM        PA6=0, PA7=1
+//   ALARM        PA6=1, PA7=0
 //
 // MOD_DUAL_HIGH:
 //   NORMAL       PA6=0, PA7=0
 //   ALARM        PA6=1, PA7=1
 //
 // MOD_COMPLEMENTARY:
-//   NORMAL       PA6=0, PA7=1
-//   ALARM        PA6=1, PA7=0
+//   NORMAL       PA6=1, PA7=0
+//   ALARM        PA6=0, PA7=1
 //
 // MOD_ACTIVE_LOW:
 //   NORMAL       PA6=1, PA7=1
@@ -217,11 +279,6 @@ enum SensorModification {
 // ------------ ВЫБЕРИТЕ МОДИФИКАЦИЮ ДАТЧИКА ЗДЕСЬ ------------
 const SensorModification SENSOR_MODIFICATION = MOD_ACTIVE_LOW;
 // -------------------------------------------------------------
-
-struct OutputState {
-  bool key1;
-  bool key2;
-};
 
 const OutputState OUTPUT_SAFE_OFF = { false, false };
 
@@ -278,6 +335,181 @@ void applyOutputs(SystemState state)
   digitalWrite(KEY2_PIN, out.key2 ? HIGH : LOW);
 }
 
+#else
+
+const OutputState OUTPUT_SAFE_OFF = { false };
+
+OutputState getOutputState(SystemState state)
+{
+  if (state == STATE_SENSOR_OPEN_OR_GND ||
+      state == STATE_SENSOR_SHORT_TO_VCC ||
+      state == STATE_WARMUP) {
+    return OUTPUT_SAFE_OFF;
+  }
+
+  return { state == STATE_ALARM };
+}
+
+void applyOutputs(SystemState state)
+{
+  OutputState out = getOutputState(state);
+  digitalWrite(KEY_PIN, out.key ? HIGH : LOW);
+}
+
+#endif
+
+// ============================================================
+// LIN slave
+// ============================================================
+
+#if LIN_DRIVER
+
+uint8_t linProtectedId(uint8_t id)
+{
+  id &= 0x3F;
+
+  uint8_t p0 =
+    ((id >> 0) ^ (id >> 1) ^ (id >> 2) ^ (id >> 4)) & 0x01;
+  uint8_t p1 =
+    (~((id >> 1) ^ (id >> 3) ^ (id >> 4) ^ (id >> 5))) & 0x01;
+
+  return id | (p0 << 6) | (p1 << 7);
+}
+
+bool linPidIsValid(uint8_t pid)
+{
+  return linProtectedId(pid & 0x3F) == pid;
+}
+
+uint8_t linChecksum(uint8_t pid, const uint8_t *data, uint8_t len)
+{
+  uint16_t sum = pid;
+
+  for (uint8_t i = 0; i < len; i++) {
+    sum += data[i];
+    if (sum > 0xFF) {
+      sum = (sum & 0xFF) + 1;
+    }
+  }
+
+  return (uint8_t)(~sum);
+}
+
+uint8_t linStateCode(SystemState state)
+{
+  return (uint8_t)state;
+}
+
+bool outputIsActive()
+{
+  OutputState out = getOutputState(systemState);
+  return out.key;
+}
+
+bool faultIsActive()
+{
+  return systemState == STATE_SENSOR_OPEN_OR_GND ||
+         systemState == STATE_SENSOR_SHORT_TO_VCC;
+}
+
+void linSendStatus(uint8_t pid)
+{
+  uint8_t flags = 0;
+
+  if (alarmLatched) {
+    flags |= 0x01;
+  }
+  if (outputIsActive()) {
+    flags |= 0x02;
+  }
+  if (faultIsActive()) {
+    flags |= 0x04;
+  }
+  if (systemState == STATE_WARMUP) {
+    flags |= 0x08;
+  }
+
+  uint8_t data[LIN_STATUS_DATA_LEN] = {
+    linStateCode(systemState),
+    flags,
+    (uint8_t)(filteredAdc & 0xFF),
+    (uint8_t)(filteredAdc >> 8)
+  };
+
+  Serial.write(data, LIN_STATUS_DATA_LEN);
+  Serial.write(linChecksum(pid, data, LIN_STATUS_DATA_LEN));
+  Serial.flush();
+}
+
+void linProcessByte(uint8_t b)
+{
+  if (millis() - lastLinByteMs > LIN_HEADER_TIMEOUT_MS) {
+    linRxState = LIN_WAIT_SYNC;
+  }
+  lastLinByteMs = millis();
+
+  if (b == 0x00) {
+    linRxState = LIN_WAIT_SYNC;
+    return;
+  }
+
+  switch (linRxState) {
+    case LIN_WAIT_SYNC:
+      if (b == 0x55) {
+        linRxState = LIN_WAIT_PID;
+      }
+      break;
+
+    case LIN_WAIT_PID:
+      linRxState = LIN_WAIT_SYNC;
+
+      if (!linPidIsValid(b)) {
+        return;
+      }
+
+      if (b == linProtectedId(LIN_STATUS_ID)) {
+        linSendStatus(b);
+      }
+      break;
+  }
+}
+
+void linService()
+{
+  while (Serial.available() > 0) {
+    int b = Serial.read();
+
+    if (b >= 0) {
+      linProcessByte((uint8_t)b);
+    }
+  }
+}
+
+void linBegin()
+{
+  pinMode(LIN_TX_PIN, OUTPUT);
+  pinMode(LIN_RX_PIN, INPUT_PULLUP);
+
+  Serial.swap(1);
+  Serial.begin(LIN_BAUD, SERIAL_8N1);
+}
+
+#endif
+
+void serviceDelay(uint16_t delayMs)
+{
+#if LIN_DRIVER
+  uint32_t startMs = millis();
+
+  while (millis() - startMs < delayMs) {
+    linService();
+    delay(1);
+  }
+#else
+  delay(delayMs);
+#endif
+}
+
 // ============================================================
 // ADC
 // ============================================================
@@ -288,7 +520,7 @@ uint16_t readAdcAverage()
 
   for (uint8_t i = 0; i < ADC_SAMPLES; i++) {
     sum += analogRead(SENSOR_PIN);
-    delay(2);
+    serviceDelay(2);
   }
 
   return sum / ADC_SAMPLES;
@@ -344,7 +576,8 @@ bool isSensorShortToVccOff(uint16_t adc)
 // Индикация светодиодом
 // ============================================================
 //
-// PA1 работает одинаково для всех модификаций датчика.
+// В базовой версии светодиод на PA1. В LIN-версии светодиод на PA3,
+// но при DEBUG он отключается, потому что PA3 используется как отладочный TX.
 //
 // WARMUP              - короткая вспышка раз в секунду
 // NORMAL              - короткая вспышка раз в 2 секунды
@@ -354,7 +587,11 @@ bool isSensorShortToVccOff(uint16_t adc)
 
 void ledSet(bool on)
 {
+#if LED_ENABLED
   digitalWrite(LED_PIN, on ? HIGH : LOW);
+#else
+  (void)on;
+#endif
 }
 
 void updateLed(SystemState state)
@@ -427,12 +664,6 @@ const char *stateToText(SystemState state)
 // Глобальные переменные
 // ============================================================
 
-uint16_t filteredAdc = 0;
-
-// Защелка ALARM. Хранится в RAM, поэтому сбрасывается после отключения питания.
-// Примечание: аппаратный сброс или сброс watchdog также очищает RAM при обычном старте.
-bool alarmLatched = false;
-
 uint32_t alarmStartMs = 0;
 uint32_t faultStartMs = 0;
 uint32_t faultReleaseStartMs = 0;
@@ -441,7 +672,7 @@ uint32_t lastDebugMs = 0;
 // ============================================================
 // Отладочный статус
 // ============================================================
-#ifdef DEBUG
+#if DEBUG
 void debugStatus(uint16_t adcRaw)
 {
   debugPrint("state=");
@@ -464,9 +695,13 @@ void debugStatus(uint16_t adcRaw)
 
   debugPrint("  out=");
   OutputState out = getOutputState(systemState);
+#if !LIN_DRIVER
   debugPrint(out.key1 ? "1" : "0");
   debugPrint(",");
   debugPrint(out.key2 ? "1" : "0");
+#else
+  debugPrint(out.key ? "1" : "0");
+#endif
 
   debugPrint("  latched=");
   debugPrint(alarmLatched ? "1" : "0");
@@ -523,7 +758,7 @@ bool processFaults(uint16_t adc)
     return true;
   }
 
-  // Новая неисправность: PA2 около 0 В
+  // Новая неисправность: SENSOR_PIN около 0 В
   if (isSensorOpenOrGndOn(adc)) {
     if (faultStartMs == 0) {
       faultStartMs = now;
@@ -540,7 +775,7 @@ bool processFaults(uint16_t adc)
     return false;
   }
 
-  // Новая неисправность: PA2 около +5 В
+  // Новая неисправность: SENSOR_PIN около +5 В
   if (isSensorShortToVccOn(adc)) {
     if (faultStartMs == 0) {
       faultStartMs = now;
@@ -569,21 +804,31 @@ bool processFaults(uint16_t adc)
 
 void setup()
 {
+#if LED_ENABLED
   pinMode(LED_PIN, OUTPUT);
+#endif
+
+#if !LIN_DRIVER
   pinMode(KEY1_PIN, OUTPUT);
   pinMode(KEY2_PIN, OUTPUT);
+#else
+  pinMode(KEY_PIN, OUTPUT);
+  linBegin();
+#endif
 
   // На плате установлена внешняя подтяжка 4.7 кОм к GND.
   // Внутренняя подтяжка не должна быть включена.
   pinMode(SENSOR_PIN, INPUT);
 
+#if DEBUG
   pinMode(DEBUG_TX_PIN, OUTPUT);
   digitalWrite(DEBUG_TX_PIN, HIGH); // уровень покоя UART
+#endif
 
   setState(STATE_WARMUP);
   applyOutputs(STATE_WARMUP);
 
-  #ifdef DEBUG
+  #if DEBUG
   debugPrintln("");
   debugPrintln("ATtiny412 gas sensor controller start");
   debugPrintln("ALARM is latched until power cycle");
@@ -594,12 +839,12 @@ void setup()
   while (millis() - warmupStart < SENSOR_WARMUP_MS) {
     updateLed(STATE_WARMUP);
     applyOutputs(STATE_WARMUP);
-    delay(20);
+    serviceDelay(20);
   }
 
   filteredAdc = readAdcAverage();
 
-  #ifdef DEBUG
+  #if DEBUG
   debugPrintln("Warmup done");
   #endif
 }
@@ -651,12 +896,12 @@ void loop()
   applyOutputs(systemState);
   updateLed(systemState);
 
-  #ifdef DEBUG
+  #if DEBUG
   if (millis() - lastDebugMs >= DEBUG_PERIOD_MS) {
     lastDebugMs = millis();
     debugStatus(adcRaw);
   }
   #endif
 
-  delay(50);
+  serviceDelay(50);
 }
