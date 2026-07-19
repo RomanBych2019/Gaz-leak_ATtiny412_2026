@@ -216,10 +216,10 @@ uint32_t lastLinByteMs = 0;
 // ============================================================
 
 enum SystemState {
-  STATE_WARMUP,
-  STATE_NORMAL,
-  STATE_ALARM,
-  STATE_SENSOR_OPEN_OR_GND,   // датчик оборван или линия датчика подключена к GND
+  STATE_WARMUP,               // датчик прогревается после включения питания
+  STATE_NORMAL,               // датчик исправен, газовый порог не превышен     
+  STATE_ALARM,                // датчик исправен, газовый порог превышен
+  STATE_SENSOR_OPEN_OR_GND,   // датчик оборван
   STATE_SENSOR_SHORT_TO_VCC   // выход датчика замкнут на питание
 };
 
@@ -269,11 +269,11 @@ struct OutputState {
 // Во время WARMUP и состояний неисправности датчика PA6/PA7 выключены.
 
 enum SensorModification {
-  MOD_SINGLE_HIGH,
-  MOD_SINGLE_LOW,
-  MOD_DUAL_HIGH,
-  MOD_COMPLEMENTARY,
-  MOD_ACTIVE_LOW
+  MOD_SINGLE_HIGH,      // ключ OUT1 с активным высоким уровнем, высокий уровень на выходе при ALARM, OUT2 неиспользуется, выключен
+  MOD_SINGLE_LOW,       // ключ OUT2 с активным низким уровнем, низкий уровень на выходе при ALARM, OUT1 неиспользуется, выключен
+  MOD_DUAL_HIGH,        // ключи OUT1 и OUT2 с активным высоким уровнем, высокий уровень на обоих выходах при ALARM
+  MOD_COMPLEMENTARY,    // ключи OUT1 и OUT2 с активным высоким уровнем, при ALARM OUT1 включен, OUT2 выключен
+  MOD_ACTIVE_LOW        // ключи OUT1 и OUT2 с активным низким уровнем, низкий уровень на обоих выходах при ALARM
 };
 
 // ------------ ВЫБЕРИТЕ МОДИФИКАЦИЮ ДАТЧИКА ЗДЕСЬ ------------

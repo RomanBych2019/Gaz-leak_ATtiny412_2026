@@ -5605,25 +5605,25 @@
 			)
 		)
 	)
-	(footprint "Resistor_SMD:R_1210_3225Metric_Pad1.30x2.65mm_HandSolder"
+	(footprint "Resistor_SMD:R_1206_3216Metric"
 		(layer "F.Cu")
 		(uuid "fd62f317-cc80-4678-a0d4-c8c2fc9637dc")
 		(at 149.5685 82.804 90)
-		(descr "Resistor SMD 1210 (3225 Metric), square (rectangular) end terminal, IPC-7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
-		(tags "resistor handsolder")
+		(descr "Resistor SMD 1206 (3216 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
+		(tags "resistor")
 		(property "Reference" "R2"
-			(at 0 -1.9 90)
+			(at 0 -1.83 90)
 			(layer "F.SilkS")
 			(uuid "8b21f939-89fd-495a-9c18-5b00a45fea31")
 			(effects
 				(font
-					(size 0.7 0.7)
-					(thickness 0.1)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
 		(property "Value" "5.1"
-			(at 0 2.28 90)
+			(at 0 1.83 90)
 			(layer "F.Fab")
 			(uuid "472d1047-4022-431e-82c6-8fa242d05885")
 			(effects
@@ -5680,18 +5680,8 @@
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
-			(start -0.723737 -1.355)
-			(end 0.723737 -1.355)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "9dcd18fb-b6d8-4739-8f48-9f81722efc26")
-		)
-		(fp_line
-			(start -0.723737 1.355)
-			(end 0.723737 1.355)
+			(start -0.727064 -0.91)
+			(end 0.727064 -0.91)
 			(stroke
 				(width 0.12)
 				(type solid)
@@ -5699,9 +5689,19 @@
 			(layer "F.SilkS")
 			(uuid "d8d640ac-2c65-4e63-a2ea-887d65242bb0")
 		)
+		(fp_line
+			(start -0.727064 0.91)
+			(end 0.727064 0.91)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "9dcd18fb-b6d8-4739-8f48-9f81722efc26")
+		)
 		(fp_rect
-			(start -2.45 -1.58)
-			(end 2.45 1.58)
+			(start -2.28 -1.13)
+			(end 2.28 1.13)
 			(stroke
 				(width 0.05)
 				(type solid)
@@ -5711,8 +5711,8 @@
 			(uuid "fa278456-b6b4-4aec-af5f-f716efcd23e3")
 		)
 		(fp_rect
-			(start -1.6 -1.245)
-			(end 1.6 1.245)
+			(start -1.6 -0.8)
+			(end 1.6 0.8)
 			(stroke
 				(width 0.1)
 				(type solid)
@@ -5733,25 +5733,25 @@
 			)
 		)
 		(pad "1" smd roundrect
-			(at -1.55 0 90)
-			(size 1.3 2.65)
+			(at -1.4625 0 90)
+			(size 1.125 1.75)
 			(layers "F.Cu" "F.Mask" "F.Paste")
-			(roundrect_rratio 0.192308)
+			(roundrect_rratio 0.222222)
 			(net "Net-(D2-A1)")
 			(pintype "passive")
 			(uuid "1920522d-d6e4-406a-8615-8907e4553b6a")
 		)
 		(pad "2" smd roundrect
-			(at 1.55 0 90)
-			(size 1.3 2.65)
+			(at 1.4625 0 90)
+			(size 1.125 1.75)
 			(layers "F.Cu" "F.Mask" "F.Paste")
-			(roundrect_rratio 0.192308)
+			(roundrect_rratio 0.222222)
 			(net "/+24_V")
 			(pintype "passive")
 			(uuid "e2e73c7f-0bef-4a09-ab47-f651d7a89943")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_1210_3225Metric.step"
+		(model "${KICAD10_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_1206_3216Metric.step"
 			(offset
 				(xyz 0 0 0)
 			)
