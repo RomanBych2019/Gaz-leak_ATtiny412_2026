@@ -4,11 +4,11 @@
 // Контроллер датчика газа на ATtiny412
 // ============================================================
 // PA0 - UPDI, не использовать как GPIO
-// PA1 - светодиод состояния платы / LIN TX в версии LIN_DRIVER
-// PA2 - вход АЦП датчика / LIN RX в версии LIN_DRIVER
-// PA3 - отладочный TX, программный UART 9600 бод / светодиод в версии LIN_DRIVER
-// PA6 - выход силового ключа 2
-// PA7 - выход силового ключа 1 / единственный активный выход в версии LIN_DRIVER
+// PA1 - светодиод состояния платы                / LIN TX в версии LIN_DRIVER
+// PA2 - вход АЦП датчика                         / LIN RX в версии LIN_DRIVER
+// PA3 - отладочный TX, программный UART 9600 бод / светодиод состояния платы в версии LIN_DRIVER
+// PA6 - выход силового ключа 2                   / вход АЦП датчика в версии LIN_DRIVER
+// PA7 - выход силового ключа 1                   / единственный активный выход в версии LIN_DRIVER
 //
 // Логика:
 // - напряжение датчика проверяется по фиксированным порогам АЦП
@@ -270,14 +270,14 @@ struct OutputState {
 
 enum SensorModification {
   MOD_SINGLE_HIGH,      // ключ OUT1 с активным высоким уровнем, высокий уровень на выходе при ALARM, OUT2 неиспользуется, выключен
-  MOD_SINGLE_LOW,       // ключ OUT2 с активным низким уровнем, низкий уровень на выходе при ALARM, OUT1 неиспользуется, выключен
+  MOD_SINGLE_LOW,       // ключ OUT1 с активным низким уровнем, низкий уровень на выходе при ALARM, OUT2 неиспользуется, выключен
   MOD_DUAL_HIGH,        // ключи OUT1 и OUT2 с активным высоким уровнем, высокий уровень на обоих выходах при ALARM
   MOD_COMPLEMENTARY,    // ключи OUT1 и OUT2 с активным высоким уровнем, при ALARM OUT1 включен, OUT2 выключен
   MOD_ACTIVE_LOW        // ключи OUT1 и OUT2 с активным низким уровнем, низкий уровень на обоих выходах при ALARM
 };
 
 // ------------ ВЫБЕРИТЕ МОДИФИКАЦИЮ ДАТЧИКА ЗДЕСЬ ------------
-const SensorModification SENSOR_MODIFICATION = MOD_ACTIVE_LOW;
+const SensorModification SENSOR_MODIFICATION = MOD_SINGLE_LOW;
 // -------------------------------------------------------------
 
 const OutputState OUTPUT_SAFE_OFF = { false, false };
@@ -337,17 +337,64 @@ void applyOutputs(SystemState state)
 
 #else
 
+// ============================================================
+// Варианты поведения PA7
+// ============================================================
+//
+// MOD_SINGLE_HIGH:
+//   NORMAL       PA7=0
+//   ALARM        PA7=1
+//
+// MOD_SINGLE_LOW:
+//   NORMAL       PA7=0
+//   ALARM        PA7=0
+//
+//
+
+enum SensorModification {
+  MOD_SINGLE_HIGH,     // ключ OUT с активным высоким уровнем, высокий уровень на выходе при ALARM
+  MOD_SINGLE_LOW       // ключ OUT с активным низким уровнем, низкий уровень на выходе при ALARM
+};
+
+// ------------ ВЫБЕРИТЕ МОДИФИКАЦИЮ ДАТЧИКА ЗДЕСЬ ------------
+const SensorModification SENSOR_MODIFICATION = MOD_SINGLE_LOW;
+// -------------------------------------------------------------
+
 const OutputState OUTPUT_SAFE_OFF = { false };
 
 OutputState getOutputState(SystemState state)
 {
+  // if (state == STATE_SENSOR_OPEN_OR_GND ||
+  //     state == STATE_SENSOR_SHORT_TO_VCC ||
+  //     state == STATE_WARMUP) {
+  //   return OUTPUT_SAFE_OFF;
+  // }
+
+  // return { state == STATE_ALARM };
+
+  bool alarm = (state == STATE_ALARM);
+
+  if (state == STATE_WARMUP){
+    alarm = false;
+  }
+  
   if (state == STATE_SENSOR_OPEN_OR_GND ||
-      state == STATE_SENSOR_SHORT_TO_VCC ||
-      state == STATE_WARMUP) {
+      state == STATE_SENSOR_SHORT_TO_VCC) {
     return OUTPUT_SAFE_OFF;
   }
 
-  return { state == STATE_ALARM };
+  switch (SENSOR_MODIFICATION) {
+    case MOD_SINGLE_HIGH:
+      if (alarm) return { true };
+      else       return { false };
+
+    case MOD_SINGLE_LOW:
+      if (alarm) return { false };
+      else       return { true };
+
+    default:
+      return OUTPUT_SAFE_OFF;
+  }
 }
 
 void applyOutputs(SystemState state)
