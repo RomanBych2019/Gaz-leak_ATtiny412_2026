@@ -24,12 +24,34 @@
 - `attiny412`: распиновка базовой платы;
 - `attiny412_lin`: распиновка платы с LIN-драйвером, сборка с `LIN_DRIVER`.
 
-Команды:
+Сборка:
 
 ```sh
 pio run -e attiny412
 pio run -e attiny412_lin
+```
+
+Прошивка:
+
+Проект использует `serialupdi`. Скорость загрузки задана в `platformio.ini`:
+`upload_speed = 19200`.
+
+Обычная версия:
+
+```sh
+pio run -e attiny412 -t upload
+```
+
+LIN-версия:
+
+```sh
 pio run -e attiny412_lin -t upload
+```
+
+Если программатор не определяется автоматически, укажите порт в `platformio.ini`:
+
+```ini
+upload_port = /dev/cu.usbserial-4
 ```
 
 LIN-вариант:
