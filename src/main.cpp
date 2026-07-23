@@ -1,5 +1,13 @@
 #include <Arduino.h>
 
+#ifndef AUTOCALIBR
+#define AUTOCALIBR 1
+#endif
+
+#if AUTOCALIBR
+#include <EEPROM.h>
+#endif
+
 // ============================================================
 // Контроллер датчика газа на ATtiny412
 // ============================================================
@@ -11,7 +19,7 @@
 // PA7 - выход силового ключа 1                   / единственный активный выход в версии LIN_DRIVER
 //
 // Логика:
-// - напряжение датчика проверяется по фиксированным порогам АЦП
+// - напряжение датчика проверяется по заводским или откалиброванным порогам АЦП
 // - АЦП около 0 В: датчик оборван или линия датчика подключена к GND
 // - АЦП около +5 В: выход датчика замкнут на VCC
 // - состояние ALARM защелкивается в RAM и сбрасывается только отключением питания
@@ -115,7 +123,7 @@ const uint16_t ADC_MAX_VALUE = 1023;
 const uint32_t SENSOR_WARMUP_MS = 45000UL;
 
 // Период отладочного вывода
-const uint32_t DEBUG_PERIOD_MS = 1000UL;
+const uint32_t DEBUG_PERIOD_MS = 5000UL;
 
 // Время подтверждения тревоги по газу.
 // ALARM защелкивается, только если газовый порог непрерывно превышен
@@ -144,13 +152,29 @@ const uint8_t FILTER_DIV = 8;
 // false - сигнал АЦП уменьшается при наличии газа
 const bool SENSOR_SIGNAL_INCREASES_WITH_GAS = true;
 
-// Порог включения тревоги по газу
+// Порог включения тревоги по газу без автокалибровки
 const uint16_t GAS_ALARM_ON_ADC = 650;
+
+// Базовый уровень чистого воздуха для заводских порогов.
+// При автокалибровке пороги сдвигаются на разницу между измеренным
+// чистым воздухом и этим значением.
+// 0.3 В при VCC = 5 В: 0.3 / 5.0 * 1023 ~= 61.
+const uint16_t GAS_CLEAN_AIR_FACTORY_ADC = 61;
 
 // Порог выключения тревоги по газу больше не используется для сброса ALARM,
 // потому что ALARM защелкивается до отключения питания.
 // Оставлен только для возможных будущих вариантов без защелкивания.
 const uint16_t GAS_ALARM_OFF_ADC = 580;
+
+#if AUTOCALIBR
+// Максимально допустимая разница между новой калибровкой и сохраненной.
+// Если разница больше, считаем, что запуск выполнен в газовой среде,
+// и используем значение из EEPROM.
+const uint16_t AUTOCALIBR_MAX_DELTA_ADC = 100;
+
+const uint16_t AUTOCALIBR_EEPROM_SIGNATURE = 0x4743; // 'G''C'
+const uint8_t AUTOCALIBR_EEPROM_ADDR = 0;
+#endif
 
 // ============================================================
 // Диагностические пороги напряжения датчика
@@ -226,6 +250,8 @@ enum SystemState {
 SystemState systemState = STATE_WARMUP;
 
 uint16_t filteredAdc = 0;
+uint16_t activeGasAlarmOnAdc = GAS_ALARM_ON_ADC;
+uint16_t activeGasAlarmOffAdc = GAS_ALARM_OFF_ADC;
 
 // Защелка ALARM. Хранится в RAM, поэтому сбрасывается после отключения питания.
 // Примечание: аппаратный сброс или сброс watchdog также очищает RAM при обычном старте.
@@ -307,8 +333,8 @@ OutputState getOutputState(SystemState state)
       else       return { false, false };
 
     case MOD_SINGLE_LOW:
-      if (alarm) return { false, true  };
-      else       return { false, false };
+      if (alarm) return { false, false  };
+      else       return { true, false };
 
     case MOD_DUAL_HIGH:
       if (alarm) return { true,  true  };
@@ -580,18 +606,18 @@ uint16_t readAdcAverage()
 bool isAlarmOnLevel(uint16_t adc)
 {
   if (SENSOR_SIGNAL_INCREASES_WITH_GAS) {
-    return adc >= GAS_ALARM_ON_ADC;
+    return adc >= activeGasAlarmOnAdc;
   } else {
-    return adc <= GAS_ALARM_ON_ADC;
+    return adc <= activeGasAlarmOnAdc;
   }
 }
 
 bool isAlarmOffLevel(uint16_t adc)
 {
   if (SENSOR_SIGNAL_INCREASES_WITH_GAS) {
-    return adc <= GAS_ALARM_OFF_ADC;
+    return adc <= activeGasAlarmOffAdc;
   } else {
-    return adc >= GAS_ALARM_OFF_ADC;
+    return adc >= activeGasAlarmOffAdc;
   }
 }
 
@@ -618,6 +644,126 @@ bool isSensorShortToVccOff(uint16_t adc)
 {
   return adc <= ADC_SENSOR_SHORT_TO_VCC_OFF;
 }
+
+// ============================================================
+// Автокалибровка чистого воздуха
+// ============================================================
+
+#if AUTOCALIBR
+
+uint16_t adcAbsDiff(uint16_t a, uint16_t b)
+{
+  return (a >= b) ? (a - b) : (b - a);
+}
+
+uint16_t clampAdc(int16_t adc)
+{
+  if (adc < 0) {
+    return 0;
+  }
+
+  if (adc > ADC_MAX_VALUE) {
+    return ADC_MAX_VALUE;
+  }
+
+  return (uint16_t)adc;
+}
+
+uint8_t autocalibrChecksum(uint16_t cleanAirAdc)
+{
+  return (uint8_t)(
+    0xA5 ^
+    (AUTOCALIBR_EEPROM_SIGNATURE & 0xFF) ^
+    (AUTOCALIBR_EEPROM_SIGNATURE >> 8) ^
+    (cleanAirAdc & 0xFF) ^
+    (cleanAirAdc >> 8)
+  );
+}
+
+uint16_t eepromReadUint16(uint8_t addr)
+{
+  return (uint16_t)EEPROM.read(addr) |
+         ((uint16_t)EEPROM.read(addr + 1) << 8);
+}
+
+void eepromUpdateUint16(uint8_t addr, uint16_t value)
+{
+  EEPROM.update(addr, (uint8_t)(value & 0xFF));
+  EEPROM.update(addr + 1, (uint8_t)(value >> 8));
+}
+
+bool loadCalibration(uint16_t &cleanAirAdc)
+{
+  uint16_t signature = eepromReadUint16(AUTOCALIBR_EEPROM_ADDR);
+  uint16_t storedAdc = eepromReadUint16(AUTOCALIBR_EEPROM_ADDR + 2);
+  uint8_t storedChecksum = EEPROM.read(AUTOCALIBR_EEPROM_ADDR + 4);
+
+  if (signature != AUTOCALIBR_EEPROM_SIGNATURE ||
+      storedAdc > ADC_MAX_VALUE ||
+      storedChecksum != autocalibrChecksum(storedAdc)) {
+    return false;
+  }
+
+  cleanAirAdc = storedAdc;
+  return true;
+}
+
+void saveCalibration(uint16_t cleanAirAdc)
+{
+  eepromUpdateUint16(AUTOCALIBR_EEPROM_ADDR, AUTOCALIBR_EEPROM_SIGNATURE);
+  eepromUpdateUint16(AUTOCALIBR_EEPROM_ADDR + 2, cleanAirAdc);
+  EEPROM.update(AUTOCALIBR_EEPROM_ADDR + 4, autocalibrChecksum(cleanAirAdc));
+}
+
+void applyCalibration(uint16_t cleanAirAdc)
+{
+  int16_t alarmOnOffset =
+    (int16_t)GAS_ALARM_ON_ADC - (int16_t)GAS_CLEAN_AIR_FACTORY_ADC;
+  int16_t alarmOffOffset =
+    (int16_t)GAS_ALARM_OFF_ADC - (int16_t)GAS_CLEAN_AIR_FACTORY_ADC;
+
+  activeGasAlarmOnAdc = clampAdc((int16_t)cleanAirAdc + alarmOnOffset);
+  activeGasAlarmOffAdc = clampAdc((int16_t)cleanAirAdc + alarmOffOffset);
+}
+
+void runInitialCalibration(uint16_t warmupAdc)
+{
+  if (isSensorOpenOrGndOn(warmupAdc) || isSensorShortToVccOn(warmupAdc)) {
+    return;
+  }
+
+  uint16_t storedCleanAirAdc = 0;
+  bool hasStoredCalibration = loadCalibration(storedCleanAirAdc);
+  uint16_t selectedCleanAirAdc = warmupAdc;
+  bool writeCalibration = false;
+
+  if (hasStoredCalibration) {
+    if (adcAbsDiff(warmupAdc, storedCleanAirAdc) <= AUTOCALIBR_MAX_DELTA_ADC) {
+      selectedCleanAirAdc = warmupAdc;
+      writeCalibration = (warmupAdc != storedCleanAirAdc);
+    } else {
+      selectedCleanAirAdc = storedCleanAirAdc;
+    }
+  } else {
+    writeCalibration = true;
+  }
+
+  applyCalibration(selectedCleanAirAdc);
+
+  if (writeCalibration) {
+    saveCalibration(selectedCleanAirAdc);
+  }
+
+#if DEBUG
+  debugPrint("Calibration clean_air=");
+  debugPrintUint(selectedCleanAirAdc);
+  debugPrint("  gas_on=");
+  debugPrintUint(activeGasAlarmOnAdc);
+  debugPrint(writeCalibration ? "  saved" : "  kept");
+  debugPrint("\r\n");
+#endif
+}
+#endif
 
 // ============================================================
 // Индикация светодиодом
@@ -732,7 +878,7 @@ void debugStatus(uint16_t adcRaw)
   debugPrintUint(filteredAdc);
 
   debugPrint("  gas_on=");
-  debugPrintUint(GAS_ALARM_ON_ADC);
+  debugPrintUint(activeGasAlarmOnAdc);
 
   debugPrint("  open_gnd_on=");
   debugPrintUint(ADC_SENSOR_OPEN_OR_GND_ON);
@@ -752,6 +898,39 @@ void debugStatus(uint16_t adcRaw)
 
   debugPrint("  latched=");
   debugPrint(alarmLatched ? "1" : "0");
+
+  debugPrint("\r\n");
+}
+
+void debugAutocalibrSettings()
+{
+  debugPrint("autocalibr=");
+#if AUTOCALIBR
+  debugPrint("1");
+
+  debugPrint("  factory_clean_air=");
+  debugPrintUint(GAS_CLEAN_AIR_FACTORY_ADC);
+
+  debugPrint("  max_delta=");
+  debugPrintUint(AUTOCALIBR_MAX_DELTA_ADC);
+
+  debugPrint("  gas_on=");
+  debugPrintUint(activeGasAlarmOnAdc);
+
+  debugPrint("  gas_off=");
+  debugPrintUint(activeGasAlarmOffAdc);
+#else
+  debugPrint("0");
+
+  debugPrint("  factory_clean_air=");
+  debugPrintUint(GAS_CLEAN_AIR_FACTORY_ADC);
+
+  debugPrint("  gas_on=");
+  debugPrintUint(GAS_ALARM_ON_ADC);
+
+  debugPrint("  gas_off=");
+  debugPrintUint(GAS_ALARM_OFF_ADC);
+#endif
 
   debugPrint("\r\n");
 }
@@ -891,6 +1070,10 @@ void setup()
 
   filteredAdc = readAdcAverage();
 
+#if AUTOCALIBR
+  runInitialCalibration(filteredAdc);
+#endif
+
   #if DEBUG
   debugPrintln("Warmup done");
   #endif
@@ -947,6 +1130,7 @@ void loop()
   if (millis() - lastDebugMs >= DEBUG_PERIOD_MS) {
     lastDebugMs = millis();
     debugStatus(adcRaw);
+    debugAutocalibrSettings();
   }
   #endif
 
