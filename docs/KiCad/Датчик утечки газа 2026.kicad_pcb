@@ -4786,13 +4786,13 @@
 		(descr "Diode SMA (DO-214AC)")
 		(tags "Diode SMA (DO-214AC)")
 		(property "Reference" "D8"
-			(at 0 -2.5 0)
+			(at 1.556 -2.159 0)
 			(layer "F.SilkS")
 			(uuid "e59ae7f5-379d-4814-ab49-dfd45b334a20")
 			(effects
 				(font
-					(size 1 1)
-					(thickness 0.15)
+					(size 0.7 0.7)
+					(thickness 0.1)
 				)
 			)
 		)
@@ -5612,13 +5612,13 @@
 		(descr "Resistor SMD 1206 (3216 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "resistor")
 		(property "Reference" "R2"
-			(at 0 -1.83 90)
+			(at -0.127 -1.423 90)
 			(layer "F.SilkS")
 			(uuid "8b21f939-89fd-495a-9c18-5b00a45fea31")
 			(effects
 				(font
-					(size 1 1)
-					(thickness 0.15)
+					(size 0.7 0.7)
+					(thickness 0.1)
 				)
 			)
 		)
@@ -15821,7 +15821,7 @@
 	)
 	(gr_text "Gnd +5v UDPI Tx"
 		(at 134.5565 69.088 0)
-		(layer "F.SilkS")
+		(layer "F.SilkS" knockout)
 		(uuid "d09cbee2-94f3-4b24-9941-5dd03024db14")
 		(effects
 			(font
@@ -15849,7 +15849,7 @@
 	)
 	(gr_text "+VCC"
 		(at 160.2105 81.788 0)
-		(layer "F.SilkS")
+		(layer "F.SilkS" knockout)
 		(uuid "b45a92a5-55d6-4503-989a-dd70123c1b2d")
 		(effects
 			(font
@@ -15863,7 +15863,7 @@
 	)
 	(gr_text "OUT1"
 		(at 160.4645 68.326 0)
-		(layer "F.SilkS")
+		(layer "F.SilkS" knockout)
 		(uuid "7b76f567-ed49-45d2-afe0-89bcab285392")
 		(effects
 			(font
@@ -15877,7 +15877,7 @@
 	)
 	(gr_text "OUT2"
 		(at 160.7185 74.168 0)
-		(layer "F.SilkS")
+		(layer "F.SilkS" knockout)
 		(uuid "15f2afa4-7126-49f7-baa7-deb8dd8d90a2")
 		(effects
 			(font
@@ -15891,7 +15891,7 @@
 	)
 	(gr_text "GND"
 		(at 160.9725 80.264 0)
-		(layer "F.SilkS")
+		(layer "F.SilkS" knockout)
 		(uuid "7e6a0969-a346-4a85-a6dd-995dad25ee27")
 		(effects
 			(font

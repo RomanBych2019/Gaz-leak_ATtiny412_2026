@@ -5,25 +5,28 @@
 #endif
 
 #if AUTOCALIBR
-#include <EEPROM.h>
+#include <avr/eeprom.h>
 #endif
 
 // ============================================================
 // Контроллер датчика газа на ATtiny412
 // ============================================================
 // PA0 - UPDI, не использовать как GPIO
-// PA1 - светодиод состояния платы                / LIN TX в версии LIN_DRIVER
-// PA2 - вход АЦП датчика                         / LIN RX в версии LIN_DRIVER
-// PA3 - отладочный TX, программный UART 9600 бод / светодиод состояния платы в версии LIN_DRIVER
-// PA6 - выход силового ключа 2                   / вход АЦП датчика в версии LIN_DRIVER
-// PA7 - выход силового ключа 1                   / единственный активный выход в версии LIN_DRIVER
+// PA1 - светодиод состояния платы                | LIN TX в версии LIN_DRIVER
+// PA2 - вход АЦП датчика                         | LIN RX в версии LIN_DRIVER
+// PA3 - отладочный TX, программный UART 9600 бод | светодиод состояния платы в
+// версии LIN_DRIVER PA6 - выход силового ключа 2                   | вход АЦП
+// датчика в версии LIN_DRIVER PA7 - выход силового ключа 1                   |
+// единственный активный выход в версии LIN_DRIVER
 //
 // Логика:
 // - напряжение датчика проверяется по заводским или откалиброванным порогам АЦП
 // - АЦП около 0 В: датчик оборван или линия датчика подключена к GND
 // - АЦП около +5 В: выход датчика замкнут на VCC
-// - состояние ALARM защелкивается в RAM и сбрасывается только отключением питания
-// - остальные состояния могут вернуться в NORMAL, когда АЦП вернется в допустимый диапазон
+// - состояние ALARM защелкивается в RAM и сбрасывается только отключением
+// питания
+// - остальные состояния могут вернуться в NORMAL, когда АЦП вернется в
+// допустимый диапазон
 // ============================================================
 
 #ifndef DEBUG
@@ -34,27 +37,27 @@
 #define LIN_DRIVER 0
 #endif
 
-#if !LIN_DRIVER
-#define LED_PIN       PIN_PA1
-#define SENSOR_PIN    PIN_PA2
-#define DEBUG_TX_PIN  PIN_PA3
-#define KEY1_PIN      PIN_PA7
-#define KEY2_PIN      PIN_PA6
+#if LIN_DRIVER
+#define LED_PIN PIN_PA3
+#define SENSOR_PIN PIN_PA6
+#define DEBUG_TX_PIN PIN_PA3
+#define KEY_PIN PIN_PA7
+#define LIN_RX_PIN PIN_PA2
+#define LIN_TX_PIN PIN_PA1
 #else
-#define LED_PIN       PIN_PA3
-#define SENSOR_PIN    PIN_PA6
-#define DEBUG_TX_PIN  PIN_PA3
-#define KEY_PIN       PIN_PA7
-#define LIN_RX_PIN    PIN_PA2
-#define LIN_TX_PIN    PIN_PA1
+#define LED_PIN PIN_PA1
+#define SENSOR_PIN PIN_PA2
+#define DEBUG_TX_PIN PIN_PA3
+#define KEY1_PIN PIN_PA7
+#define KEY2_PIN PIN_PA6
 #endif
 
 #if DEBUG && LIN_DRIVER
 // В LIN-версии PA3 используется светодиодом, но при DEBUG приоритет у
 // отладочного TX на PA3, поэтому индикация светодиодом отключается.
-#define LED_ENABLED   0
+#define LED_ENABLED 0
 #else
-#define LED_ENABLED   1
+#define LED_ENABLED 1
 #endif
 
 // ============================================================
@@ -63,17 +66,15 @@
 
 #if DEBUG
 
-const uint32_t  DEBUG_BAUD = 2400;
-const uint16_t  BIT_TIME_US = (1000000UL / DEBUG_BAUD);
+const uint32_t DEBUG_BAUD = 2400;
+const uint16_t BIT_TIME_US = (1000000UL / DEBUG_BAUD);
 
-void debugTxWriteBit(bool bitValue)
-{
+void debugTxWriteBit(bool bitValue) {
   digitalWrite(DEBUG_TX_PIN, bitValue ? HIGH : LOW);
   delayMicroseconds(BIT_TIME_US);
 }
 
-void debugTxWriteByte(uint8_t b)
-{
+void debugTxWriteByte(uint8_t b) {
   noInterrupts();
 
   // Стартовый бит
@@ -91,21 +92,18 @@ void debugTxWriteByte(uint8_t b)
   interrupts();
 }
 
-void debugPrint(const char *s)
-{
+void debugPrint(const char *s) {
   while (*s) {
     debugTxWriteByte((uint8_t)*s++);
   }
 }
 
-void debugPrintln(const char *s)
-{
+void debugPrintln(const char *s) {
   debugPrint(s);
   debugPrint("\r\n");
 }
 
-void debugPrintUint(uint32_t value)
-{
+void debugPrintUint(uint32_t value) {
   char buf[12];
   ultoa(value, buf, 10);
   debugPrint(buf);
@@ -134,7 +132,8 @@ const uint32_t ALARM_CONFIRM_MS = 3000UL;
 const uint32_t FAULT_CONFIRM_MS = 1000UL;
 
 // Время выхода из неисправности датчика.
-// Состояния FAULT могут вернуться в NORMAL, когда АЦП вернется в допустимый диапазон.
+// Состояния FAULT могут вернуться в NORMAL, когда АЦП вернется в допустимый
+// диапазон.
 const uint32_t FAULT_RELEASE_MS = 1000UL;
 
 // Усреднение АЦП
@@ -153,7 +152,7 @@ const uint8_t FILTER_DIV = 8;
 const bool SENSOR_SIGNAL_INCREASES_WITH_GAS = true;
 
 // Порог включения тревоги по газу без автокалибровки
-const uint16_t GAS_ALARM_ON_ADC = 650;
+const uint16_t GAS_ALARM_ON_ADC = 600;
 
 // Базовый уровень чистого воздуха для заводских порогов.
 // При автокалибровке пороги сдвигаются на разницу между измеренным
@@ -164,13 +163,13 @@ const uint16_t GAS_CLEAN_AIR_FACTORY_ADC = 61;
 // Порог выключения тревоги по газу больше не используется для сброса ALARM,
 // потому что ALARM защелкивается до отключения питания.
 // Оставлен только для возможных будущих вариантов без защелкивания.
-const uint16_t GAS_ALARM_OFF_ADC = 580;
+const uint16_t GAS_ALARM_OFF_ADC = 550;
 
 #if AUTOCALIBR
 // Максимально допустимая разница между новой калибровкой и сохраненной.
 // Если разница больше, считаем, что запуск выполнен в газовой среде,
 // и используем значение из EEPROM.
-const uint16_t AUTOCALIBR_MAX_DELTA_ADC = 100;
+const uint16_t AUTOCALIBR_MAX_DELTA_ADC = 60;
 
 const uint16_t AUTOCALIBR_EEPROM_SIGNATURE = 0x4743; // 'G''C'
 const uint8_t AUTOCALIBR_EEPROM_ADDR = 0;
@@ -192,10 +191,10 @@ const uint8_t AUTOCALIBR_EEPROM_ADDR = 0;
 //
 // Пороги OFF задают гистерезис для возврата из состояний неисправности.
 
-const uint16_t ADC_SENSOR_OPEN_OR_GND_ON  = 20;
+const uint16_t ADC_SENSOR_OPEN_OR_GND_ON = 20;
 const uint16_t ADC_SENSOR_OPEN_OR_GND_OFF = 50;
 
-const uint16_t ADC_SENSOR_SHORT_TO_VCC_ON  = 1000;
+const uint16_t ADC_SENSOR_SHORT_TO_VCC_ON = 1000;
 const uint16_t ADC_SENSOR_SHORT_TO_VCC_OFF = 970;
 
 // Приблизительные значения при VCC = 5 В:
@@ -226,10 +225,7 @@ const uint8_t LIN_STATUS_ID = 0x12;
 const uint8_t LIN_STATUS_DATA_LEN = 4;
 const uint8_t LIN_HEADER_TIMEOUT_MS = 10;
 
-enum LinRxState {
-  LIN_WAIT_SYNC,
-  LIN_WAIT_PID
-};
+enum LinRxState { LIN_WAIT_SYNC, LIN_WAIT_PID };
 
 LinRxState linRxState = LIN_WAIT_SYNC;
 uint32_t lastLinByteMs = 0;
@@ -240,11 +236,11 @@ uint32_t lastLinByteMs = 0;
 // ============================================================
 
 enum SystemState {
-  STATE_WARMUP,               // датчик прогревается после включения питания
-  STATE_NORMAL,               // датчик исправен, газовый порог не превышен     
-  STATE_ALARM,                // датчик исправен, газовый порог превышен
-  STATE_SENSOR_OPEN_OR_GND,   // датчик оборван
-  STATE_SENSOR_SHORT_TO_VCC   // выход датчика замкнут на питание
+  STATE_WARMUP,             // датчик прогревается после включения питания
+  STATE_NORMAL,             // датчик исправен, газовый порог не превышен
+  STATE_ALARM,              // датчик исправен, газовый порог превышен
+  STATE_SENSOR_OPEN_OR_GND, // датчик оборван
+  STATE_SENSOR_SHORT_TO_VCC // выход датчика замкнут на питание
 };
 
 SystemState systemState = STATE_WARMUP;
@@ -254,7 +250,8 @@ uint16_t activeGasAlarmOnAdc = GAS_ALARM_ON_ADC;
 uint16_t activeGasAlarmOffAdc = GAS_ALARM_OFF_ADC;
 
 // Защелка ALARM. Хранится в RAM, поэтому сбрасывается после отключения питания.
-// Примечание: аппаратный сброс или сброс watchdog также очищает RAM при обычном старте.
+// Примечание: аппаратный сброс или сброс watchdog также очищает RAM при обычном
+// старте.
 bool alarmLatched = false;
 
 struct OutputState {
@@ -277,8 +274,8 @@ struct OutputState {
 //   ALARM        PA6=0, PA7=1
 //
 // MOD_SINGLE_LOW:
-//   NORMAL       PA6=0, PA7=0
-//   ALARM        PA6=1, PA7=0
+//   NORMAL       PA6=0, PA7=1
+//   ALARM        PA6=0, PA7=0
 //
 // MOD_DUAL_HIGH:
 //   NORMAL       PA6=0, PA7=0
@@ -292,69 +289,81 @@ struct OutputState {
 //   NORMAL       PA6=1, PA7=1
 //   ALARM        PA6=0, PA7=0
 //
-// Во время WARMUP и состояний неисправности датчика PA6/PA7 выключены.
+// Во время WARMUP PA6/PA7 в NORMAL.
 
 enum SensorModification {
-  MOD_SINGLE_HIGH,      // ключ OUT1 с активным высоким уровнем, высокий уровень на выходе при ALARM, OUT2 неиспользуется, выключен
-  MOD_SINGLE_LOW,       // ключ OUT1 с активным низким уровнем, низкий уровень на выходе при ALARM, OUT2 неиспользуется, выключен
-  MOD_DUAL_HIGH,        // ключи OUT1 и OUT2 с активным высоким уровнем, высокий уровень на обоих выходах при ALARM
-  MOD_COMPLEMENTARY,    // ключи OUT1 и OUT2 с активным высоким уровнем, при ALARM OUT1 включен, OUT2 выключен
-  MOD_ACTIVE_LOW        // ключи OUT1 и OUT2 с активным низким уровнем, низкий уровень на обоих выходах при ALARM
+  MOD_SINGLE_HIGH, // ключ OUT1 с активным высоким уровнем, высокий уровень на
+                   // выходе при ALARM, OUT2 неиспользуется, выключен
+  MOD_SINGLE_LOW, // ключ OUT1 с активным низким уровнем, низкий уровень на
+                  // выходе при ALARM, OUT2 неиспользуется, выключен
+  MOD_DUAL_HIGH, // ключи OUT1 и OUT2 с активным высоким уровнем, высокий
+                 // уровень на обоих выходах при ALARM
+  MOD_COMPLEMENTARY, // ключи OUT1 и OUT2 с активным высоким уровнем, при ALARM
+                     // OUT1 включен, OUT2 выключен
+  MOD_ACTIVE_LOW // ключи OUT1 и OUT2 с активным низким уровнем, низкий уровень
+                 // на обоих выходах при ALARM
 };
 
 // ------------ ВЫБЕРИТЕ МОДИФИКАЦИЮ ДАТЧИКА ЗДЕСЬ ------------
-const SensorModification SENSOR_MODIFICATION = MOD_SINGLE_LOW;
+const SensorModification SENSOR_MODIFICATION = MOD_DUAL_HIGH;
 // -------------------------------------------------------------
 
-const OutputState OUTPUT_SAFE_OFF = { false, false };
+const OutputState OUTPUT_SAFE_OFF = {false, false};
 
-OutputState getOutputState(SystemState state)
-{
+OutputState getOutputState(SystemState state) {
   // if (state == STATE_WARMUP ||
   //     state == STATE_SENSOR_OPEN_OR_GND ||
   //     state == STATE_SENSOR_SHORT_TO_VCC) {
   //   return OUTPUT_SAFE_OFF;
   // }
-  
+
   bool alarm = (state == STATE_ALARM);
 
-  if (state == STATE_WARMUP){
+  if (state == STATE_WARMUP) {
     alarm = false;
   }
-  
-  if (state == STATE_SENSOR_OPEN_OR_GND ||
-      state == STATE_SENSOR_SHORT_TO_VCC) {
+
+  if (state == STATE_SENSOR_OPEN_OR_GND || state == STATE_SENSOR_SHORT_TO_VCC) {
     return OUTPUT_SAFE_OFF;
   }
 
   switch (SENSOR_MODIFICATION) {
-    case MOD_SINGLE_HIGH:
-      if (alarm) return { true,  false };
-      else       return { false, false };
+  case MOD_SINGLE_HIGH:
+    if (alarm)
+      return {true, false};
+    else
+      return {false, false};
 
-    case MOD_SINGLE_LOW:
-      if (alarm) return { false, false  };
-      else       return { true, false };
+  case MOD_SINGLE_LOW:
+    if (alarm)
+      return {false, false};
+    else
+      return {true, false};
 
-    case MOD_DUAL_HIGH:
-      if (alarm) return { true,  true  };
-      else       return { false, false };
+  case MOD_DUAL_HIGH:
+    if (alarm)
+      return {true, true};
+    else
+      return {false, false};
 
-    case MOD_COMPLEMENTARY:
-      if (alarm) return { true,  false };
-      else       return { false, true  };
+  case MOD_COMPLEMENTARY:
+    if (alarm)
+      return {true, false};
+    else
+      return {false, true};
 
-    case MOD_ACTIVE_LOW:
-      if (alarm) return { false, false };
-      else       return { true,  true  };
+  case MOD_ACTIVE_LOW:
+    if (alarm)
+      return {false, false};
+    else
+      return {true, true};
 
-    default:
-      return OUTPUT_SAFE_OFF;
+  default:
+    return OUTPUT_SAFE_OFF;
   }
 }
 
-void applyOutputs(SystemState state)
-{
+void applyOutputs(SystemState state) {
   OutputState out = getOutputState(state);
 
   digitalWrite(KEY1_PIN, out.key1 ? HIGH : LOW);
@@ -372,59 +381,55 @@ void applyOutputs(SystemState state)
 //   ALARM        PA7=1
 //
 // MOD_SINGLE_LOW:
-//   NORMAL       PA7=0
+//   NORMAL       PA7=1
 //   ALARM        PA7=0
 //
 //
 
 enum SensorModification {
-  MOD_SINGLE_HIGH,     // ключ OUT с активным высоким уровнем, высокий уровень на выходе при ALARM
-  MOD_SINGLE_LOW       // ключ OUT с активным низким уровнем, низкий уровень на выходе при ALARM
+  MOD_SINGLE_HIGH, // ключ OUT с активным высоким уровнем, высокий уровень на
+                   // выходе при ALARM
+  MOD_SINGLE_LOW // ключ OUT с активным низким уровнем, низкий уровень на выходе
+                 // при ALARM
 };
 
 // ------------ ВЫБЕРИТЕ МОДИФИКАЦИЮ ДАТЧИКА ЗДЕСЬ ------------
-const SensorModification SENSOR_MODIFICATION = MOD_SINGLE_LOW;
+const SensorModification SENSOR_MODIFICATION = MOD_SINGLE_HIGH;
 // -------------------------------------------------------------
 
-const OutputState OUTPUT_SAFE_OFF = { false };
+const OutputState OUTPUT_SAFE_OFF = {false};
 
-OutputState getOutputState(SystemState state)
-{
-  // if (state == STATE_SENSOR_OPEN_OR_GND ||
-  //     state == STATE_SENSOR_SHORT_TO_VCC ||
-  //     state == STATE_WARMUP) {
-  //   return OUTPUT_SAFE_OFF;
-  // }
-
-  // return { state == STATE_ALARM };
+OutputState getOutputState(SystemState state) {
 
   bool alarm = (state == STATE_ALARM);
 
-  if (state == STATE_WARMUP){
+  if (state == STATE_WARMUP) {
     alarm = false;
   }
-  
-  if (state == STATE_SENSOR_OPEN_OR_GND ||
-      state == STATE_SENSOR_SHORT_TO_VCC) {
+
+  if (state == STATE_SENSOR_OPEN_OR_GND || state == STATE_SENSOR_SHORT_TO_VCC) {
     return OUTPUT_SAFE_OFF;
   }
 
   switch (SENSOR_MODIFICATION) {
-    case MOD_SINGLE_HIGH:
-      if (alarm) return { true };
-      else       return { false };
+  case MOD_SINGLE_HIGH:
+    if (alarm)
+      return {true};
+    else
+      return {false};
 
-    case MOD_SINGLE_LOW:
-      if (alarm) return { false };
-      else       return { true };
+  case MOD_SINGLE_LOW:
+    if (alarm)
+      return {false};
+    else
+      return {true};
 
-    default:
-      return OUTPUT_SAFE_OFF;
+  default:
+    return OUTPUT_SAFE_OFF;
   }
 }
 
-void applyOutputs(SystemState state)
-{
+void applyOutputs(SystemState state) {
   OutputState out = getOutputState(state);
   digitalWrite(KEY_PIN, out.key ? HIGH : LOW);
 }
@@ -437,25 +442,18 @@ void applyOutputs(SystemState state)
 
 #if LIN_DRIVER
 
-uint8_t linProtectedId(uint8_t id)
-{
+uint8_t linProtectedId(uint8_t id) {
   id &= 0x3F;
 
-  uint8_t p0 =
-    ((id >> 0) ^ (id >> 1) ^ (id >> 2) ^ (id >> 4)) & 0x01;
-  uint8_t p1 =
-    (~((id >> 1) ^ (id >> 3) ^ (id >> 4) ^ (id >> 5))) & 0x01;
+  uint8_t p0 = ((id >> 0) ^ (id >> 1) ^ (id >> 2) ^ (id >> 4)) & 0x01;
+  uint8_t p1 = (~((id >> 1) ^ (id >> 3) ^ (id >> 4) ^ (id >> 5))) & 0x01;
 
   return id | (p0 << 6) | (p1 << 7);
 }
 
-bool linPidIsValid(uint8_t pid)
-{
-  return linProtectedId(pid & 0x3F) == pid;
-}
+bool linPidIsValid(uint8_t pid) { return linProtectedId(pid & 0x3F) == pid; }
 
-uint8_t linChecksum(uint8_t pid, const uint8_t *data, uint8_t len)
-{
+uint8_t linChecksum(uint8_t pid, const uint8_t *data, uint8_t len) {
   uint16_t sum = pid;
 
   for (uint8_t i = 0; i < len; i++) {
@@ -468,25 +466,19 @@ uint8_t linChecksum(uint8_t pid, const uint8_t *data, uint8_t len)
   return (uint8_t)(~sum);
 }
 
-uint8_t linStateCode(SystemState state)
-{
-  return (uint8_t)state;
-}
+uint8_t linStateCode(SystemState state) { return (uint8_t)state; }
 
-bool outputIsActive()
-{
+bool outputIsActive() {
   OutputState out = getOutputState(systemState);
   return out.key;
 }
 
-bool faultIsActive()
-{
+bool faultIsActive() {
   return systemState == STATE_SENSOR_OPEN_OR_GND ||
          systemState == STATE_SENSOR_SHORT_TO_VCC;
 }
 
-void linSendStatus(uint8_t pid)
-{
+void linSendStatus(uint8_t pid) {
   uint8_t flags = 0;
 
   if (alarmLatched) {
@@ -502,20 +494,16 @@ void linSendStatus(uint8_t pid)
     flags |= 0x08;
   }
 
-  uint8_t data[LIN_STATUS_DATA_LEN] = {
-    linStateCode(systemState),
-    flags,
-    (uint8_t)(filteredAdc & 0xFF),
-    (uint8_t)(filteredAdc >> 8)
-  };
+  uint8_t data[LIN_STATUS_DATA_LEN] = {linStateCode(systemState), flags,
+                                       (uint8_t)(filteredAdc & 0xFF),
+                                       (uint8_t)(filteredAdc >> 8)};
 
   Serial.write(data, LIN_STATUS_DATA_LEN);
   Serial.write(linChecksum(pid, data, LIN_STATUS_DATA_LEN));
   Serial.flush();
 }
 
-void linProcessByte(uint8_t b)
-{
+void linProcessByte(uint8_t b) {
   if (millis() - lastLinByteMs > LIN_HEADER_TIMEOUT_MS) {
     linRxState = LIN_WAIT_SYNC;
   }
@@ -527,28 +515,27 @@ void linProcessByte(uint8_t b)
   }
 
   switch (linRxState) {
-    case LIN_WAIT_SYNC:
-      if (b == 0x55) {
-        linRxState = LIN_WAIT_PID;
-      }
-      break;
+  case LIN_WAIT_SYNC:
+    if (b == 0x55) {
+      linRxState = LIN_WAIT_PID;
+    }
+    break;
 
-    case LIN_WAIT_PID:
-      linRxState = LIN_WAIT_SYNC;
+  case LIN_WAIT_PID:
+    linRxState = LIN_WAIT_SYNC;
 
-      if (!linPidIsValid(b)) {
-        return;
-      }
+    if (!linPidIsValid(b)) {
+      return;
+    }
 
-      if (b == linProtectedId(LIN_STATUS_ID)) {
-        linSendStatus(b);
-      }
-      break;
+    if (b == linProtectedId(LIN_STATUS_ID)) {
+      linSendStatus(b);
+    }
+    break;
   }
 }
 
-void linService()
-{
+void linService() {
   while (Serial.available() > 0) {
     int b = Serial.read();
 
@@ -558,8 +545,7 @@ void linService()
   }
 }
 
-void linBegin()
-{
+void linBegin() {
   pinMode(LIN_TX_PIN, OUTPUT);
   pinMode(LIN_RX_PIN, INPUT_PULLUP);
 
@@ -569,8 +555,7 @@ void linBegin()
 
 #endif
 
-void serviceDelay(uint16_t delayMs)
-{
+void serviceDelay(uint16_t delayMs) {
 #if LIN_DRIVER
   uint32_t startMs = millis();
 
@@ -587,8 +572,7 @@ void serviceDelay(uint16_t delayMs)
 // ADC
 // ============================================================
 
-uint16_t readAdcAverage()
-{
+uint16_t readAdcAverage() {
   uint32_t sum = 0;
 
   for (uint8_t i = 0; i < ADC_SAMPLES; i++) {
@@ -603,8 +587,7 @@ uint16_t readAdcAverage()
 // Логика газового порога
 // ============================================================
 
-bool isAlarmOnLevel(uint16_t adc)
-{
+bool isAlarmOnLevel(uint16_t adc) {
   if (SENSOR_SIGNAL_INCREASES_WITH_GAS) {
     return adc >= activeGasAlarmOnAdc;
   } else {
@@ -612,8 +595,7 @@ bool isAlarmOnLevel(uint16_t adc)
   }
 }
 
-bool isAlarmOffLevel(uint16_t adc)
-{
+bool isAlarmOffLevel(uint16_t adc) {
   if (SENSOR_SIGNAL_INCREASES_WITH_GAS) {
     return adc <= activeGasAlarmOffAdc;
   } else {
@@ -625,23 +607,19 @@ bool isAlarmOffLevel(uint16_t adc)
 // Логика уровней неисправности датчика
 // ============================================================
 
-bool isSensorOpenOrGndOn(uint16_t adc)
-{
+bool isSensorOpenOrGndOn(uint16_t adc) {
   return adc <= ADC_SENSOR_OPEN_OR_GND_ON;
 }
 
-bool isSensorOpenOrGndOff(uint16_t adc)
-{
+bool isSensorOpenOrGndOff(uint16_t adc) {
   return adc >= ADC_SENSOR_OPEN_OR_GND_OFF;
 }
 
-bool isSensorShortToVccOn(uint16_t adc)
-{
+bool isSensorShortToVccOn(uint16_t adc) {
   return adc >= ADC_SENSOR_SHORT_TO_VCC_ON;
 }
 
-bool isSensorShortToVccOff(uint16_t adc)
-{
+bool isSensorShortToVccOff(uint16_t adc) {
   return adc <= ADC_SENSOR_SHORT_TO_VCC_OFF;
 }
 
@@ -651,13 +629,11 @@ bool isSensorShortToVccOff(uint16_t adc)
 
 #if AUTOCALIBR
 
-uint16_t adcAbsDiff(uint16_t a, uint16_t b)
-{
+uint16_t adcAbsDiff(uint16_t a, uint16_t b) {
   return (a >= b) ? (a - b) : (b - a);
 }
 
-uint16_t clampAdc(int16_t adc)
-{
+uint16_t clampAdc(int16_t adc) {
   if (adc < 0) {
     return 0;
   }
@@ -669,37 +645,29 @@ uint16_t clampAdc(int16_t adc)
   return (uint16_t)adc;
 }
 
-uint8_t autocalibrChecksum(uint16_t cleanAirAdc)
-{
-  return (uint8_t)(
-    0xA5 ^
-    (AUTOCALIBR_EEPROM_SIGNATURE & 0xFF) ^
-    (AUTOCALIBR_EEPROM_SIGNATURE >> 8) ^
-    (cleanAirAdc & 0xFF) ^
-    (cleanAirAdc >> 8)
-  );
+uint8_t autocalibrChecksum(uint16_t cleanAirAdc) {
+  return (uint8_t)(0xA5 ^ (AUTOCALIBR_EEPROM_SIGNATURE & 0xFF) ^
+                   (AUTOCALIBR_EEPROM_SIGNATURE >> 8) ^ (cleanAirAdc & 0xFF) ^
+                   (cleanAirAdc >> 8));
 }
 
-uint16_t eepromReadUint16(uint8_t addr)
-{
-  return (uint16_t)EEPROM.read(addr) |
-         ((uint16_t)EEPROM.read(addr + 1) << 8);
+uint16_t eepromReadUint16(uint8_t addr) {
+  return (uint16_t)eeprom_read_byte((const uint8_t *)addr) |
+         ((uint16_t)eeprom_read_byte((const uint8_t *)(addr + 1)) << 8);
 }
 
-void eepromUpdateUint16(uint8_t addr, uint16_t value)
-{
-  EEPROM.update(addr, (uint8_t)(value & 0xFF));
-  EEPROM.update(addr + 1, (uint8_t)(value >> 8));
+void eepromUpdateUint16(uint8_t addr, uint16_t value) {
+  eeprom_update_byte((uint8_t *)addr, (uint8_t)(value & 0xFF));
+  eeprom_update_byte((uint8_t *)(addr + 1), (uint8_t)(value >> 8));
 }
 
-bool loadCalibration(uint16_t &cleanAirAdc)
-{
+bool loadCalibration(uint16_t &cleanAirAdc) {
   uint16_t signature = eepromReadUint16(AUTOCALIBR_EEPROM_ADDR);
   uint16_t storedAdc = eepromReadUint16(AUTOCALIBR_EEPROM_ADDR + 2);
-  uint8_t storedChecksum = EEPROM.read(AUTOCALIBR_EEPROM_ADDR + 4);
+  uint8_t storedChecksum =
+      eeprom_read_byte((const uint8_t *)(AUTOCALIBR_EEPROM_ADDR + 4));
 
-  if (signature != AUTOCALIBR_EEPROM_SIGNATURE ||
-      storedAdc > ADC_MAX_VALUE ||
+  if (signature != AUTOCALIBR_EEPROM_SIGNATURE || storedAdc > ADC_MAX_VALUE ||
       storedChecksum != autocalibrChecksum(storedAdc)) {
     return false;
   }
@@ -708,26 +676,24 @@ bool loadCalibration(uint16_t &cleanAirAdc)
   return true;
 }
 
-void saveCalibration(uint16_t cleanAirAdc)
-{
+void saveCalibration(uint16_t cleanAirAdc) {
   eepromUpdateUint16(AUTOCALIBR_EEPROM_ADDR, AUTOCALIBR_EEPROM_SIGNATURE);
   eepromUpdateUint16(AUTOCALIBR_EEPROM_ADDR + 2, cleanAirAdc);
-  EEPROM.update(AUTOCALIBR_EEPROM_ADDR + 4, autocalibrChecksum(cleanAirAdc));
+  eeprom_update_byte((uint8_t *)(AUTOCALIBR_EEPROM_ADDR + 4),
+                     autocalibrChecksum(cleanAirAdc));
 }
 
-void applyCalibration(uint16_t cleanAirAdc)
-{
+void applyCalibration(uint16_t cleanAirAdc) {
   int16_t alarmOnOffset =
-    (int16_t)GAS_ALARM_ON_ADC - (int16_t)GAS_CLEAN_AIR_FACTORY_ADC;
+      (int16_t)GAS_ALARM_ON_ADC - (int16_t)GAS_CLEAN_AIR_FACTORY_ADC;
   int16_t alarmOffOffset =
-    (int16_t)GAS_ALARM_OFF_ADC - (int16_t)GAS_CLEAN_AIR_FACTORY_ADC;
+      (int16_t)GAS_ALARM_OFF_ADC - (int16_t)GAS_CLEAN_AIR_FACTORY_ADC;
 
   activeGasAlarmOnAdc = clampAdc((int16_t)cleanAirAdc + alarmOnOffset);
   activeGasAlarmOffAdc = clampAdc((int16_t)cleanAirAdc + alarmOffOffset);
 }
 
-void runInitialCalibration(uint16_t warmupAdc)
-{
+void runInitialCalibration(uint16_t warmupAdc) {
   if (isSensorOpenOrGndOn(warmupAdc) || isSensorShortToVccOn(warmupAdc)) {
     return;
   }
@@ -778,8 +744,7 @@ void runInitialCalibration(uint16_t warmupAdc)
 // SENSOR_OPEN_OR_GND  - две вспышки, пауза
 // SENSOR_SHORT_TO_VCC - три вспышки, пауза
 
-void ledSet(bool on)
-{
+void ledSet(bool on) {
 #if LED_ENABLED
   digitalWrite(LED_PIN, on ? HIGH : LOW);
 #else
@@ -787,69 +752,55 @@ void ledSet(bool on)
 #endif
 }
 
-void updateLed(SystemState state)
-{
+void updateLed(SystemState state) {
+#if LED_ENABLED
   uint32_t t = millis();
 
   switch (state) {
-    case STATE_WARMUP:
-      ledSet((t % 1000UL) < 100UL);
-      break;
+  case STATE_WARMUP:
+    ledSet((t % 1000UL) < 100UL);
+    break;
 
-    case STATE_NORMAL:
-      ledSet((t % 2000UL) < 80UL);
-      break;
+  case STATE_NORMAL:
+    ledSet((t % 2000UL) < 80UL);
+    break;
 
-    case STATE_ALARM:
-      ledSet((t % 250UL) < 125UL);
-      break;
+  case STATE_ALARM:
+    ledSet((t % 250UL) < 125UL);
+    break;
 
-    case STATE_SENSOR_OPEN_OR_GND: {
-      uint32_t p = t % 2000UL;
-      bool on =
-        (p < 120UL) ||
-        (p >= 300UL && p < 420UL);
-      ledSet(on);
-      break;
-    }
-
-    case STATE_SENSOR_SHORT_TO_VCC: {
-      uint32_t p = t % 2000UL;
-      bool on =
-        (p < 120UL) ||
-        (p >= 300UL && p < 420UL) ||
-        (p >= 600UL && p < 720UL);
-      ledSet(on);
-      break;
-    }
-
-    default:
-      ledSet(false);
-      break;
+  case STATE_SENSOR_OPEN_OR_GND: {
+    uint32_t p = t % 2000UL;
+    bool on = (p < 120UL) || (p >= 300UL && p < 420UL);
+    ledSet(on);
+    break;
   }
+
+  case STATE_SENSOR_SHORT_TO_VCC: {
+    uint32_t p = t % 2000UL;
+    bool on =
+        (p < 120UL) || (p >= 300UL && p < 420UL) || (p >= 600UL && p < 720UL);
+    ledSet(on);
+    break;
+  }
+
+  default:
+    ledSet(false);
+    break;
+  }
+#else
+  (void)state;
+#endif
 }
 
 // ============================================================
 // Вспомогательные функции состояния
 // ============================================================
 
-void setState(SystemState newState)
-{
+void setState(SystemState newState) {
   if (systemState != newState) {
     systemState = newState;
     applyOutputs(systemState);
-  }
-}
-
-const char *stateToText(SystemState state)
-{
-  switch (state) {
-    case STATE_WARMUP:              return "WARMUP";
-    case STATE_NORMAL:              return "NORMAL";
-    case STATE_ALARM:               return "ALARM";
-    case STATE_SENSOR_OPEN_OR_GND:  return "SENSOR_OPEN_OR_GND";
-    case STATE_SENSOR_SHORT_TO_VCC: return "SENSOR_SHORT_TO_VCC";
-    default:                        return "UNKNOWN";
   }
 }
 
@@ -866,27 +817,26 @@ uint32_t lastDebugMs = 0;
 // Отладочный статус
 // ============================================================
 #if DEBUG
-void debugStatus(uint16_t adcRaw)
-{
-  debugPrint("state=");
-  debugPrint(stateToText(systemState));
+void debugStatus(uint16_t adcRaw) {
+  debugPrint("s=");
+  debugPrintUint(systemState);
 
-  debugPrint("  adc=");
+  debugPrint(" a=");
   debugPrintUint(adcRaw);
 
-  debugPrint("  filt=");
+  debugPrint(" f=");
   debugPrintUint(filteredAdc);
 
-  debugPrint("  gas_on=");
+  debugPrint(" go=");
   debugPrintUint(activeGasAlarmOnAdc);
 
-  debugPrint("  open_gnd_on=");
+  debugPrint(" og=");
   debugPrintUint(ADC_SENSOR_OPEN_OR_GND_ON);
 
-  debugPrint("  short_vcc_on=");
+  debugPrint(" sv=");
   debugPrintUint(ADC_SENSOR_SHORT_TO_VCC_ON);
 
-  debugPrint("  out=");
+  debugPrint(" o=");
   OutputState out = getOutputState(systemState);
 #if !LIN_DRIVER
   debugPrint(out.key1 ? "1" : "0");
@@ -896,14 +846,14 @@ void debugStatus(uint16_t adcRaw)
   debugPrint(out.key ? "1" : "0");
 #endif
 
-  debugPrint("  latched=");
+  debugPrint(" l=");
   debugPrint(alarmLatched ? "1" : "0");
 
   debugPrint("\r\n");
 }
 
-void debugAutocalibrSettings()
-{
+#if !LIN_DRIVER
+void debugAutocalibrSettings() {
   debugPrint("autocalibr=");
 #if AUTOCALIBR
   debugPrint("1");
@@ -935,13 +885,13 @@ void debugAutocalibrSettings()
   debugPrint("\r\n");
 }
 #endif
+#endif
 
 // ============================================================
 // Обработка неисправностей датчика
 // ============================================================
 
-bool processFaults(uint16_t adc)
-{
+bool processFaults(uint16_t adc) {
   uint32_t now = millis();
 
   // Уже в состоянии: датчик оборван или линия датчика подключена к GND
@@ -1028,8 +978,7 @@ bool processFaults(uint16_t adc)
 // Настройка
 // ============================================================
 
-void setup()
-{
+void setup() {
 #if LED_ENABLED
   pinMode(LED_PIN, OUTPUT);
 #endif
@@ -1054,11 +1003,11 @@ void setup()
   setState(STATE_WARMUP);
   applyOutputs(STATE_WARMUP);
 
-  #if DEBUG
+#if DEBUG
   debugPrintln("");
-  debugPrintln("ATtiny412 gas sensor controller start");
-  debugPrintln("ALARM is latched until power cycle");
-  #endif
+  debugPrintln("start");
+  debugPrintln("latched alarm");
+#endif
 
   uint32_t warmupStart = millis();
 
@@ -1074,21 +1023,20 @@ void setup()
   runInitialCalibration(filteredAdc);
 #endif
 
-  #if DEBUG
-  debugPrintln("Warmup done");
-  #endif
+#if DEBUG
+  debugPrintln("warmup ok");
+#endif
 }
 
 // ============================================================
 // Основной цикл
 // ============================================================
 
-void loop()
-{
+void loop() {
   uint16_t adcRaw = readAdcAverage();
 
   filteredAdc =
-    ((uint32_t)filteredAdc * (FILTER_DIV - 1) + adcRaw) / FILTER_DIV;
+      ((uint32_t)filteredAdc * (FILTER_DIV - 1) + adcRaw) / FILTER_DIV;
 
   // ----------------------------------------------------------
   // Если ALARM защелкнут, он не может вернуться в NORMAL.
@@ -1102,8 +1050,7 @@ void loop()
     // Состояния неисправности датчика восстанавливаемые.
     bool faultActive = processFaults(filteredAdc);
 
-    if (!faultActive &&
-        systemState != STATE_SENSOR_OPEN_OR_GND &&
+    if (!faultActive && systemState != STATE_SENSOR_OPEN_OR_GND &&
         systemState != STATE_SENSOR_SHORT_TO_VCC) {
 
       // Ждать, пока газовый порог будет превышен непрерывно.
@@ -1126,13 +1073,15 @@ void loop()
   applyOutputs(systemState);
   updateLed(systemState);
 
-  #if DEBUG
+#if DEBUG
   if (millis() - lastDebugMs >= DEBUG_PERIOD_MS) {
     lastDebugMs = millis();
     debugStatus(adcRaw);
+#if !LIN_DRIVER
     debugAutocalibrSettings();
+#endif
   }
-  #endif
+#endif
 
   serviceDelay(50);
 }
