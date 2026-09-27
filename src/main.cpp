@@ -69,7 +69,7 @@ const uint32_t DEBUG_BAUD = 2400;
 const uint16_t BIT_TIME_US = (1000000UL / DEBUG_BAUD);
 
 void debugTxWriteBit(bool bitValue) {
-  digitalWrite(DEBUG_TX_PIN, bitValue ? HIGH : LOW);
+  digitalWriteFast(DEBUG_TX_PIN, bitValue ? HIGH : LOW);
   delayMicroseconds(BIT_TIME_US);
 }
 
@@ -376,8 +376,8 @@ OutputState getOutputState(SystemState state) {
 void applyOutputs(SystemState state) {
   OutputState out = getOutputState(state);
 
-  digitalWrite(KEY1_PIN, out.key1 ? HIGH : LOW);
-  digitalWrite(KEY2_PIN, out.key2 ? HIGH : LOW);
+  digitalWriteFast(KEY1_PIN, out.key1 ? HIGH : LOW);
+  digitalWriteFast(KEY2_PIN, out.key2 ? HIGH : LOW);
 }
 
 #else
@@ -442,7 +442,7 @@ OutputState getOutputState(SystemState state) {
 
 void applyOutputs(SystemState state) {
   OutputState out = getOutputState(state);
-  digitalWrite(KEY_PIN, out.key ? HIGH : LOW);
+  digitalWriteFast(KEY_PIN, out.key ? HIGH : LOW);
 }
 
 #endif
@@ -561,8 +561,8 @@ void linService() {
 }
 
 void linBegin() {
-  pinMode(LIN_TX_PIN, OUTPUT);
-  pinMode(LIN_RX_PIN, INPUT_PULLUP);
+  pinModeFast(LIN_TX_PIN, OUTPUT);
+  pinModeFast(LIN_RX_PIN, INPUT_PULLUP);
 
   Serial.swap(1);
   Serial.begin(LIN_BAUD, SERIAL_8N1);
@@ -762,7 +762,7 @@ void runInitialCalibration(uint16_t warmupAdc) {
 
 void ledSet(bool on) {
 #if LED_ENABLED
-  digitalWrite(LED_PIN, on ? HIGH : LOW);
+  digitalWriteFast(LED_PIN, on ? HIGH : LOW);
 #else
   (void)on;
 #endif
@@ -959,7 +959,7 @@ bool processLoadShortFeedback() {
     return false;
   }
 
-  if (digitalRead(KEY_PIN) == LOW) {
+  if (digitalReadFast(KEY_PIN) == LOW) {
     uint32_t now = millis();
 
     if (loadShortStartMs == 0) {
@@ -1075,24 +1075,24 @@ bool processFaults(uint16_t adc) {
 
 void setup() {
 #if LED_ENABLED
-  pinMode(LED_PIN, OUTPUT);
+  pinModeFast(LED_PIN, OUTPUT);
 #endif
 
 #if !LIN_DRIVER
-  pinMode(KEY1_PIN, OUTPUT);
-  pinMode(KEY2_PIN, OUTPUT);
+  pinModeFast(KEY1_PIN, OUTPUT);
+  pinModeFast(KEY2_PIN, OUTPUT);
 #else
-  pinMode(KEY_PIN, OUTPUT);
+  pinModeFast(KEY_PIN, OUTPUT);
   linBegin();
 #endif
 
   // На плате установлена внешняя подтяжка 4.7 кОм к GND.
   // Внутренняя подтяжка не должна быть включена.
-  pinMode(SENSOR_PIN, INPUT);
+  pinModeFast(SENSOR_PIN, INPUT);
 
 #if DEBUG
-  pinMode(DEBUG_TX_PIN, OUTPUT);
-  digitalWrite(DEBUG_TX_PIN, HIGH); // уровень покоя UART
+  pinModeFast(DEBUG_TX_PIN, OUTPUT);
+  digitalWriteFast(DEBUG_TX_PIN, HIGH); // уровень покоя UART
 #endif
 
   setState(STATE_WARMUP);
