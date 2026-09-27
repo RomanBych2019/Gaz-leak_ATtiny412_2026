@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 #ifndef AUTOCALIBR
-#define AUTOCALIBR 1
+#define AUTOCALIBR 0
 #endif
 
 #if AUTOCALIBR
@@ -14,10 +14,9 @@
 // PA0 - UPDI, не использовать как GPIO
 // PA1 - светодиод состояния платы                | LIN TX в версии LIN_DRIVER
 // PA2 - вход АЦП датчика                         | LIN RX в версии LIN_DRIVER
-// PA3 - отладочный TX, программный UART 9600 бод | светодиод состояния платы в
-// версии LIN_DRIVER PA6 - выход силового ключа 2                   | вход АЦП
-// датчика в версии LIN_DRIVER PA7 - выход силового ключа 1                   |
-// единственный активный выход в версии LIN_DRIVER
+// PA3 - отладочный TX, программный UART 9600 бод | светодиод состояния платы в версии LIN_DRIVER 
+// PA6 - выход силового ключа 2                   | вход АЦП датчика в версии LIN_DRIVER 
+// PA7 - выход силового ключа 1                   | единственный активный выход в версии LIN_DRIVER
 //
 // Логика:
 // - напряжение датчика проверяется по заводским или откалиброванным порогам АЦП
@@ -34,7 +33,7 @@
 #endif
 
 #ifndef LIN_DRIVER
-#define LIN_DRIVER 0
+#define LIN_DRIVER 1
 #endif
 
 #if LIN_DRIVER
@@ -135,6 +134,15 @@ const uint32_t FAULT_CONFIRM_MS = 1000UL;
 // Состояния FAULT могут вернуться в NORMAL, когда АЦП вернется в допустимый
 // диапазон.
 const uint32_t FAULT_RELEASE_MS = 1000UL;
+
+#if LIN_DRIVER
+// В LIN-версии PA7 управляет BTS4142N. При включенном ключе микроконтроллер
+// читает фактический уровень KEY_PIN: низкий уровень означает, что BTS сообщает
+// о замыкании нагрузки/перегрузке.
+const uint32_t LOAD_SHORT_CONFIRM_MS = 100UL;
+const uint32_t LOAD_SHORT_RETRY_MS = 1000UL;
+const uint8_t LOAD_SHORT_MAX_RETRIES = 5;
+#endif
 
 // Усреднение АЦП
 const uint8_t ADC_SAMPLES = 16;
@@ -240,7 +248,8 @@ enum SystemState {
   STATE_NORMAL,             // датчик исправен, газовый порог не превышен
   STATE_ALARM,              // датчик исправен, газовый порог превышен
   STATE_SENSOR_OPEN_OR_GND, // датчик оборван
-  STATE_SENSOR_SHORT_TO_VCC // выход датчика замкнут на питание
+  STATE_SENSOR_SHORT_TO_VCC, // выход датчика замкнут на питание
+  STATE_LOAD_SHORT          // замыкание нагрузки силового ключа
 };
 
 SystemState systemState = STATE_WARMUP;
@@ -323,7 +332,8 @@ OutputState getOutputState(SystemState state) {
     alarm = false;
   }
 
-  if (state == STATE_SENSOR_OPEN_OR_GND || state == STATE_SENSOR_SHORT_TO_VCC) {
+  if (state == STATE_SENSOR_OPEN_OR_GND ||
+      state == STATE_SENSOR_SHORT_TO_VCC || state == STATE_LOAD_SHORT) {
     return OUTPUT_SAFE_OFF;
   }
 
@@ -407,7 +417,8 @@ OutputState getOutputState(SystemState state) {
     alarm = false;
   }
 
-  if (state == STATE_SENSOR_OPEN_OR_GND || state == STATE_SENSOR_SHORT_TO_VCC) {
+  if (state == STATE_SENSOR_OPEN_OR_GND ||
+      state == STATE_SENSOR_SHORT_TO_VCC || state == STATE_LOAD_SHORT) {
     return OUTPUT_SAFE_OFF;
   }
 
@@ -475,7 +486,8 @@ bool outputIsActive() {
 
 bool faultIsActive() {
   return systemState == STATE_SENSOR_OPEN_OR_GND ||
-         systemState == STATE_SENSOR_SHORT_TO_VCC;
+         systemState == STATE_SENSOR_SHORT_TO_VCC ||
+         systemState == STATE_LOAD_SHORT;
 }
 
 void linSendStatus(uint8_t pid) {
@@ -492,6 +504,9 @@ void linSendStatus(uint8_t pid) {
   }
   if (systemState == STATE_WARMUP) {
     flags |= 0x08;
+  }
+  if (systemState == STATE_LOAD_SHORT) {
+    flags |= 0x10;
   }
 
   uint8_t data[LIN_STATUS_DATA_LEN] = {linStateCode(systemState), flags,
@@ -743,6 +758,7 @@ void runInitialCalibration(uint16_t warmupAdc) {
 // ALARM               - частое мигание, защелкнуто до отключения питания
 // SENSOR_OPEN_OR_GND  - две вспышки, пауза
 // SENSOR_SHORT_TO_VCC - три вспышки, пауза
+// LOAD_SHORT          - четыре вспышки, пауза
 
 void ledSet(bool on) {
 #if LED_ENABLED
@@ -769,17 +785,27 @@ void updateLed(SystemState state) {
     ledSet((t % 250UL) < 125UL);
     break;
 
-  case STATE_SENSOR_OPEN_OR_GND: {
+  case STATE_SENSOR_OPEN_OR_GND:
+  case STATE_SENSOR_SHORT_TO_VCC:
+  case STATE_LOAD_SHORT: {
     uint32_t p = t % 2000UL;
-    bool on = (p < 120UL) || (p >= 300UL && p < 420UL);
-    ledSet(on);
-    break;
-  }
+    uint8_t flashCount = 2;
 
-  case STATE_SENSOR_SHORT_TO_VCC: {
-    uint32_t p = t % 2000UL;
-    bool on =
-        (p < 120UL) || (p >= 300UL && p < 420UL) || (p >= 600UL && p < 720UL);
+    if (state == STATE_SENSOR_SHORT_TO_VCC) {
+      flashCount = 3;
+    } else if (state == STATE_LOAD_SHORT) {
+      flashCount = 4;
+    }
+
+    bool on = false;
+    for (uint8_t i = 0; i < flashCount; i++) {
+      uint16_t start = 300U * i;
+
+      if (p >= start && p < start + 120U) {
+        on = true;
+      }
+    }
+
     ledSet(on);
     break;
   }
@@ -811,6 +837,11 @@ void setState(SystemState newState) {
 uint32_t alarmStartMs = 0;
 uint32_t faultStartMs = 0;
 uint32_t faultReleaseStartMs = 0;
+#if LIN_DRIVER
+uint32_t loadShortStartMs = 0;
+uint32_t loadShortRetryStartMs = 0;
+uint8_t loadShortRetryCount = 0;
+#endif
 uint32_t lastDebugMs = 0;
 
 // ============================================================
@@ -885,6 +916,70 @@ void debugAutocalibrSettings() {
   debugPrint("\r\n");
 }
 #endif
+#endif
+
+// ============================================================
+// Обработка замыкания нагрузки силового ключа
+// ============================================================
+
+#if LIN_DRIVER
+
+bool processLoadShortHold() {
+  if (systemState != STATE_LOAD_SHORT) {
+    return false;
+  }
+
+  // После пяти повторов выход остается выключенным до перезапуска.
+  if (loadShortRetryCount == LOAD_SHORT_MAX_RETRIES) {
+    return true;
+  }
+
+  uint32_t now = millis();
+
+  if (loadShortRetryStartMs == 0) {
+    loadShortRetryStartMs = now;
+  }
+
+  if (now - loadShortRetryStartMs < LOAD_SHORT_RETRY_MS) {
+    return true;
+  }
+
+  loadShortRetryStartMs = 0;
+  loadShortRetryCount++;
+  setState(alarmLatched ? STATE_ALARM : STATE_NORMAL);
+
+  return false;
+}
+
+bool processLoadShortFeedback() {
+  OutputState out = getOutputState(systemState);
+
+  if (!out.key) {
+    loadShortStartMs = 0;
+    return false;
+  }
+
+  if (digitalRead(KEY_PIN) == LOW) {
+    uint32_t now = millis();
+
+    if (loadShortStartMs == 0) {
+      loadShortStartMs = now;
+    }
+
+    if (now - loadShortStartMs >= LOAD_SHORT_CONFIRM_MS) {
+      loadShortStartMs = 0;
+      loadShortRetryStartMs = 0;
+      alarmStartMs = 0;
+      setState(STATE_LOAD_SHORT);
+      return true;
+    }
+  } else {
+    loadShortStartMs = 0;
+  }
+
+  return false;
+}
+
 #endif
 
 // ============================================================
@@ -1038,12 +1133,20 @@ void loop() {
   filteredAdc =
       ((uint32_t)filteredAdc * (FILTER_DIV - 1) + adcRaw) / FILTER_DIV;
 
+#if LIN_DRIVER
+  bool loadShortHeld = processLoadShortHold();
+#else
+  const bool loadShortHeld = false;
+#endif
+
   // ----------------------------------------------------------
   // Если ALARM защелкнут, он не может вернуться в NORMAL.
   // Сброс только снятием питания с контроллера.
   // Остальные состояния могут вернуться в NORMAL.
   // ----------------------------------------------------------
-  if (alarmLatched) {
+  if (loadShortHeld) {
+    // Состояние удерживается до следующей пробной попытки включения BTS4142N.
+  } else if (alarmLatched) {
     setState(STATE_ALARM);
   } else {
     // Сначала обработать диагностические состояния напряжения датчика.
@@ -1071,6 +1174,13 @@ void loop() {
   }
 
   applyOutputs(systemState);
+
+#if LIN_DRIVER
+  if (processLoadShortFeedback()) {
+    applyOutputs(systemState);
+  }
+#endif
+
   updateLed(systemState);
 
 #if DEBUG

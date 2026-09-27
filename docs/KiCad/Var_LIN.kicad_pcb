@@ -5833,12 +5833,12 @@
 		(uuid "62be453e-5fc3-466f-9a00-1f21ab0bf75e")
 	)
 	(gr_text "Gnd +5v UDPI Tx"
-		(at 121.1735 97.023 0)
+		(at 120.3235 97.023 0)
 		(layer "F.SilkS" knockout)
 		(uuid "c68295af-a834-4ab8-b558-04e2c4390f89")
 		(effects
 			(font
-				(size 0.6 0.5)
+				(size 0.7 0.6)
 				(thickness 0.1)
 				(bold yes)
 				(italic yes)
@@ -5861,7 +5861,7 @@
 		)
 	)
 	(gr_text "+VCC"
-		(at 147.5905 110.526057 0)
+		(at 147.5905 110.726057 0)
 		(layer "F.SilkS" knockout)
 		(uuid "a0421196-dd9e-42ca-b821-a9a7f9eeebff")
 		(effects
