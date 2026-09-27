@@ -522,7 +522,7 @@
   "pcbnew": {
     "last_paths": {
       "idf": "",
-      "netlist": "",
+      "netlist": "./",
       "plot": "",
       "specctra_dsn": "",
       "vrml": ""
@@ -647,7 +647,7 @@
         "uuid": "7ba6580f-d6de-4a31-bf3e-7919f02a8856"
       }
     ],
-    "used_designators": "D8",
+    "used_designators": "",
     "variants": []
   },
   "sheets": [
