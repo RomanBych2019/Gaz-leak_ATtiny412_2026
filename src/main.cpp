@@ -33,7 +33,7 @@
 #endif
 
 #ifndef LIN_DRIVER
-#define LIN_DRIVER 1
+#define LIN_DRIVER 0
 #endif
 
 #if LIN_DRIVER
@@ -174,9 +174,9 @@ const uint16_t GAS_CLEAN_AIR_FACTORY_ADC = 61;
 const uint16_t GAS_ALARM_OFF_ADC = 550;
 
 #if AUTOCALIBR
-// Максимально допустимая разница между новой калибровкой и сохраненной.
-// Если разница больше, считаем, что запуск выполнен в газовой среде,
-// и используем значение из EEPROM.
+// Максимально допустимое изменение газовых порогов относительно
+// заводских значений. Измеренный уровень чистого воздуха должен
+// быть в пределах GAS_CLEAN_AIR_FACTORY_ADC +/- этого значения.
 const uint16_t AUTOCALIBR_MAX_DELTA_ADC = 60;
 
 const uint16_t AUTOCALIBR_EEPROM_SIGNATURE = 0x4743; // 'G''C'
@@ -648,6 +648,11 @@ uint16_t adcAbsDiff(uint16_t a, uint16_t b) {
   return (a >= b) ? (a - b) : (b - a);
 }
 
+bool calibrationIsInRange(uint16_t cleanAirAdc) {
+  return adcAbsDiff(cleanAirAdc, GAS_CLEAN_AIR_FACTORY_ADC) <=
+         AUTOCALIBR_MAX_DELTA_ADC;
+}
+
 uint16_t clampAdc(int16_t adc) {
   if (adc < 0) {
     return 0;
@@ -683,6 +688,7 @@ bool loadCalibration(uint16_t &cleanAirAdc) {
       eeprom_read_byte((const uint8_t *)(AUTOCALIBR_EEPROM_ADDR + 4));
 
   if (signature != AUTOCALIBR_EEPROM_SIGNATURE || storedAdc > ADC_MAX_VALUE ||
+      !calibrationIsInRange(storedAdc) ||
       storedChecksum != autocalibrChecksum(storedAdc)) {
     return false;
   }
@@ -718,15 +724,14 @@ void runInitialCalibration(uint16_t warmupAdc) {
   uint16_t selectedCleanAirAdc = warmupAdc;
   bool writeCalibration = false;
 
-  if (hasStoredCalibration) {
-    if (adcAbsDiff(warmupAdc, storedCleanAirAdc) <= AUTOCALIBR_MAX_DELTA_ADC) {
-      selectedCleanAirAdc = warmupAdc;
-      writeCalibration = (warmupAdc != storedCleanAirAdc);
-    } else {
-      selectedCleanAirAdc = storedCleanAirAdc;
-    }
+  if (calibrationIsInRange(warmupAdc)) {
+    selectedCleanAirAdc = warmupAdc;
+    writeCalibration =
+        !hasStoredCalibration || warmupAdc != storedCleanAirAdc;
+  } else if (hasStoredCalibration) {
+    selectedCleanAirAdc = storedCleanAirAdc;
   } else {
-    writeCalibration = true;
+    return;
   }
 
   applyCalibration(selectedCleanAirAdc);
