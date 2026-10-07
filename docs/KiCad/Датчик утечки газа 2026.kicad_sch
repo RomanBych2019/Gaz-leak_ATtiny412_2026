@@ -1300,26 +1300,24 @@
 			(on_board yes)
 			(in_pos_files yes)
 			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "U"
-				(at -12.7 13.97 0)
+			(property "Reference" "U4"
+				(at 0 17.78 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(justify left bottom)
 				)
 			)
 			(property "Value" "BTS72002EPAXUMA1"
-				(at -12.7 -13.97 0)
+				(at 0 15.24 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(justify left top)
 				)
 			)
 			(property "Footprint" "BTS72002EPAXUMA1:SOP65P600X115-15N_BTS72002EPAXUMA1"
@@ -1520,7 +1518,7 @@
 					)
 				)
 				(pin input line
-					(at -17.78 5.08 0)
+					(at -17.78 2.54 0)
 					(length 5.08)
 					(name "IN0"
 						(effects
@@ -1592,7 +1590,7 @@
 					)
 				)
 				(pin input line
-					(at -17.78 2.54 0)
+					(at -17.78 5.08 0)
 					(length 5.08)
 					(name "IN1"
 						(effects
@@ -2857,16 +2855,6 @@
 	)
 	(wire
 		(pts
-			(xy 208.28 58.42) (xy 208.28 60.96)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0ad2b431-2ee4-41b1-9a63-fad513687971")
-	)
-	(wire
-		(pts
 			(xy 165.1 31.75) (xy 171.45 31.75)
 		)
 		(stroke
@@ -2927,16 +2915,6 @@
 	)
 	(wire
 		(pts
-			(xy 203.2 63.5) (xy 203.2 58.42)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "18c4059e-9bbb-46ad-80f6-a177f512cc99")
-	)
-	(wire
-		(pts
 			(xy 207.01 71.12) (xy 208.28 71.12)
 		)
 		(stroke
@@ -2954,16 +2932,6 @@
 			(type default)
 		)
 		(uuid "310367e0-64e6-4157-b292-ed248b65582b")
-	)
-	(wire
-		(pts
-			(xy 205.74 63.5) (xy 208.28 63.5)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "34483ea2-9834-46eb-bed4-108b7dc3b6f5")
 	)
 	(wire
 		(pts
@@ -2987,7 +2955,7 @@
 	)
 	(wire
 		(pts
-			(xy 200.66 60.96) (xy 205.74 60.96)
+			(xy 200.66 60.96) (xy 208.28 60.96)
 		)
 		(stroke
 			(width 0)
@@ -3187,7 +3155,7 @@
 	)
 	(wire
 		(pts
-			(xy 200.66 63.5) (xy 203.2 63.5)
+			(xy 200.66 63.5) (xy 208.28 63.5)
 		)
 		(stroke
 			(width 0)
@@ -3517,16 +3485,6 @@
 	)
 	(wire
 		(pts
-			(xy 205.74 60.96) (xy 205.74 63.5)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "cd0599cf-4040-437b-8778-95048fbe0fca")
-	)
-	(wire
-		(pts
 			(xy 227.33 135.89) (xy 237.49 135.89)
 		)
 		(stroke
@@ -3624,16 +3582,6 @@
 			(type default)
 		)
 		(uuid "e655d47d-bd87-4379-b10b-7142d46e7707")
-	)
-	(wire
-		(pts
-			(xy 203.2 58.42) (xy 208.28 58.42)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e67c249a-13f0-4cea-a43c-49b3dc993d6e")
 	)
 	(wire
 		(pts
@@ -4257,7 +4205,7 @@
 				)
 			)
 		)
-		(property "Description" "AC0603KRX7R9BB104"
+		(property "Description" "Unpolarized capacitor"
 			(at 116.84 124.46 0)
 			(hide yes)
 			(show_name no)
@@ -4338,7 +4286,7 @@
 				)
 			)
 		)
-		(property "Description" "GRM21BR61A476ME15L"
+		(property "Description" "Unpolarized capacitor"
 			(at 139.7 134.62 0)
 			(hide yes)
 			(show_name no)
@@ -4747,7 +4695,7 @@
 				)
 			)
 		)
-		(property "Sim.Device" "MBRA360, Диод Шоттки 60В 3А [SMA / DO-214AC]"
+		(property "Sim.Device" "D"
 			(at 53.34 129.54 0)
 			(hide yes)
 			(show_name no)
@@ -5165,7 +5113,7 @@
 				)
 			)
 		)
-		(property "Description" "LQH44PN4R7MP0L"
+		(property "Description" "Inductor"
 			(at 124.46 119.38 0)
 			(hide yes)
 			(show_name no)
@@ -5323,7 +5271,7 @@
 				)
 			)
 		)
-		(property "Description" "FYLS-0805URC"
+		(property "Description" "Light emitting diode"
 			(at 212.09 33.02 0)
 			(hide yes)
 			(show_name no)
@@ -5472,7 +5420,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_1206_3216Metric"
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 66.04 127.762 90)
 			(hide yes)
 			(show_name no)
@@ -5745,7 +5693,7 @@
 				)
 			)
 		)
-		(property "Description" "AC0603KRX7R9BB104"
+		(property "Description" "Unpolarized capacitor"
 			(at 83.82 134.62 0)
 			(hide yes)
 			(show_name no)
@@ -5826,7 +5774,7 @@
 				)
 			)
 		)
-		(property "Description" "GRM21BR61H106KE43L"
+		(property "Description" "Unpolarized capacitor"
 			(at 88.9 134.62 0)
 			(hide yes)
 			(show_name no)
@@ -6138,7 +6086,7 @@
 				)
 			)
 		)
-		(property "Description" "AC0603KRX7R9BB104"
+		(property "Description" "Unpolarized capacitor"
 			(at 165.1 35.56 0)
 			(hide yes)
 			(show_name no)
