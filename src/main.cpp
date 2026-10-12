@@ -34,6 +34,7 @@
 
 #ifndef LIN_DRIVER
 #define LIN_DRIVER 0
+
 #endif
 
 #if LIN_DRIVER
@@ -134,15 +135,6 @@ const uint32_t FAULT_CONFIRM_MS = 1000UL;
 // Состояния FAULT могут вернуться в NORMAL, когда АЦП вернется в допустимый
 // диапазон.
 const uint32_t FAULT_RELEASE_MS = 1000UL;
-
-#if LIN_DRIVER
-// В LIN-версии PA7 управляет BTS4142N. При включенном ключе микроконтроллер
-// читает фактический уровень KEY_PIN: низкий уровень означает, что BTS сообщает
-// о замыкании нагрузки/перегрузке.
-const uint32_t LOAD_SHORT_CONFIRM_MS = 100UL;
-const uint32_t LOAD_SHORT_RETRY_MS = 1000UL;
-const uint8_t LOAD_SHORT_MAX_RETRIES = 5;
-#endif
 
 // Усреднение АЦП
 const uint8_t ADC_SAMPLES = 16;
@@ -248,8 +240,7 @@ enum SystemState {
   STATE_NORMAL,             // датчик исправен, газовый порог не превышен
   STATE_ALARM,              // датчик исправен, газовый порог превышен
   STATE_SENSOR_OPEN_OR_GND, // датчик оборван
-  STATE_SENSOR_SHORT_TO_VCC, // выход датчика замкнут на питание
-  STATE_LOAD_SHORT          // замыкание нагрузки силового ключа
+  STATE_SENSOR_SHORT_TO_VCC // выход датчика замкнут на питание
 };
 
 SystemState systemState = STATE_WARMUP;
@@ -314,7 +305,7 @@ enum SensorModification {
 };
 
 // ------------ ВЫБЕРИТЕ МОДИФИКАЦИЮ ДАТЧИКА ЗДЕСЬ ------------
-const SensorModification SENSOR_MODIFICATION = MOD_DUAL_HIGH;
+const SensorModification SENSOR_MODIFICATION = MOD_SINGLE_LOW;
 // -------------------------------------------------------------
 
 const OutputState OUTPUT_SAFE_OFF = {false, false};
@@ -333,7 +324,7 @@ OutputState getOutputState(SystemState state) {
   }
 
   if (state == STATE_SENSOR_OPEN_OR_GND ||
-      state == STATE_SENSOR_SHORT_TO_VCC || state == STATE_LOAD_SHORT) {
+      state == STATE_SENSOR_SHORT_TO_VCC) {
     return OUTPUT_SAFE_OFF;
   }
 
@@ -404,7 +395,7 @@ enum SensorModification {
 };
 
 // ------------ ВЫБЕРИТЕ МОДИФИКАЦИЮ ДАТЧИКА ЗДЕСЬ ------------
-const SensorModification SENSOR_MODIFICATION = MOD_SINGLE_HIGH;
+const SensorModification SENSOR_MODIFICATION = MOD_SINGLE_LOW;
 // -------------------------------------------------------------
 
 const OutputState OUTPUT_SAFE_OFF = {false};
@@ -418,7 +409,7 @@ OutputState getOutputState(SystemState state) {
   }
 
   if (state == STATE_SENSOR_OPEN_OR_GND ||
-      state == STATE_SENSOR_SHORT_TO_VCC || state == STATE_LOAD_SHORT) {
+      state == STATE_SENSOR_SHORT_TO_VCC) {
     return OUTPUT_SAFE_OFF;
   }
 
@@ -486,8 +477,7 @@ bool outputIsActive() {
 
 bool faultIsActive() {
   return systemState == STATE_SENSOR_OPEN_OR_GND ||
-         systemState == STATE_SENSOR_SHORT_TO_VCC ||
-         systemState == STATE_LOAD_SHORT;
+         systemState == STATE_SENSOR_SHORT_TO_VCC;
 }
 
 void linSendStatus(uint8_t pid) {
@@ -504,9 +494,6 @@ void linSendStatus(uint8_t pid) {
   }
   if (systemState == STATE_WARMUP) {
     flags |= 0x08;
-  }
-  if (systemState == STATE_LOAD_SHORT) {
-    flags |= 0x10;
   }
 
   uint8_t data[LIN_STATUS_DATA_LEN] = {linStateCode(systemState), flags,
@@ -763,7 +750,6 @@ void runInitialCalibration(uint16_t warmupAdc) {
 // ALARM               - частое мигание, защелкнуто до отключения питания
 // SENSOR_OPEN_OR_GND  - две вспышки, пауза
 // SENSOR_SHORT_TO_VCC - три вспышки, пауза
-// LOAD_SHORT          - четыре вспышки, пауза
 
 void ledSet(bool on) {
 #if LED_ENABLED
@@ -791,15 +777,12 @@ void updateLed(SystemState state) {
     break;
 
   case STATE_SENSOR_OPEN_OR_GND:
-  case STATE_SENSOR_SHORT_TO_VCC:
-  case STATE_LOAD_SHORT: {
+  case STATE_SENSOR_SHORT_TO_VCC: {
     uint32_t p = t % 2000UL;
     uint8_t flashCount = 2;
 
     if (state == STATE_SENSOR_SHORT_TO_VCC) {
       flashCount = 3;
-    } else if (state == STATE_LOAD_SHORT) {
-      flashCount = 4;
     }
 
     bool on = false;
@@ -842,11 +825,6 @@ void setState(SystemState newState) {
 uint32_t alarmStartMs = 0;
 uint32_t faultStartMs = 0;
 uint32_t faultReleaseStartMs = 0;
-#if LIN_DRIVER
-uint32_t loadShortStartMs = 0;
-uint32_t loadShortRetryStartMs = 0;
-uint8_t loadShortRetryCount = 0;
-#endif
 uint32_t lastDebugMs = 0;
 
 // ============================================================
@@ -921,70 +899,6 @@ void debugAutocalibrSettings() {
   debugPrint("\r\n");
 }
 #endif
-#endif
-
-// ============================================================
-// Обработка замыкания нагрузки силового ключа
-// ============================================================
-
-#if LIN_DRIVER
-
-bool processLoadShortHold() {
-  if (systemState != STATE_LOAD_SHORT) {
-    return false;
-  }
-
-  // После пяти повторов выход остается выключенным до перезапуска.
-  if (loadShortRetryCount == LOAD_SHORT_MAX_RETRIES) {
-    return true;
-  }
-
-  uint32_t now = millis();
-
-  if (loadShortRetryStartMs == 0) {
-    loadShortRetryStartMs = now;
-  }
-
-  if (now - loadShortRetryStartMs < LOAD_SHORT_RETRY_MS) {
-    return true;
-  }
-
-  loadShortRetryStartMs = 0;
-  loadShortRetryCount++;
-  setState(alarmLatched ? STATE_ALARM : STATE_NORMAL);
-
-  return false;
-}
-
-bool processLoadShortFeedback() {
-  OutputState out = getOutputState(systemState);
-
-  if (!out.key) {
-    loadShortStartMs = 0;
-    return false;
-  }
-
-  if (digitalReadFast(KEY_PIN) == LOW) {
-    uint32_t now = millis();
-
-    if (loadShortStartMs == 0) {
-      loadShortStartMs = now;
-    }
-
-    if (now - loadShortStartMs >= LOAD_SHORT_CONFIRM_MS) {
-      loadShortStartMs = 0;
-      loadShortRetryStartMs = 0;
-      alarmStartMs = 0;
-      setState(STATE_LOAD_SHORT);
-      return true;
-    }
-  } else {
-    loadShortStartMs = 0;
-  }
-
-  return false;
-}
-
 #endif
 
 // ============================================================
@@ -1138,20 +1052,12 @@ void loop() {
   filteredAdc =
       ((uint32_t)filteredAdc * (FILTER_DIV - 1) + adcRaw) / FILTER_DIV;
 
-#if LIN_DRIVER
-  bool loadShortHeld = processLoadShortHold();
-#else
-  const bool loadShortHeld = false;
-#endif
-
   // ----------------------------------------------------------
   // Если ALARM защелкнут, он не может вернуться в NORMAL.
   // Сброс только снятием питания с контроллера.
   // Остальные состояния могут вернуться в NORMAL.
   // ----------------------------------------------------------
-  if (loadShortHeld) {
-    // Состояние удерживается до следующей пробной попытки включения BTS4142N.
-  } else if (alarmLatched) {
+  if (alarmLatched) {
     setState(STATE_ALARM);
   } else {
     // Сначала обработать диагностические состояния напряжения датчика.
@@ -1179,12 +1085,6 @@ void loop() {
   }
 
   applyOutputs(systemState);
-
-#if LIN_DRIVER
-  if (processLoadShortFeedback()) {
-    applyOutputs(systemState);
-  }
-#endif
 
   updateLed(systemState);
 
